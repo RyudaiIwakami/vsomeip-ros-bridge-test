@@ -1,10 +1,9 @@
 #!/bin/bash
 
-dlt-daemon &
+dlt-daemon -p 50002 &
 routingmanagerd &
 
-gpsfake -c 1 -v /usr/share/nmea/simulation.nmea &
+VSOMEIP_CONFIGURATION=/etc/vsomeip-server.json
 
-source /src/install/setup.sh
+ros2 run gnss_provider gnss-server
 
-VSOMEIP_APPLICATION_NAME=gnss-server ros2 run gnss_provider gnss-server
