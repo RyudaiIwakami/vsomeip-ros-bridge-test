@@ -5,6 +5,8 @@ project(gnss_provider VERSION 0.0.2)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(nmea_msgs_INCLUDE_DIRS/opt/ros/humble/include/nmea_msgs)
+
 
 include(GNUInstallDirs)
 
@@ -22,6 +24,13 @@ find_package(concurrentqueue REQUIRED)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 
+# find_package(sensor_msgs REQUIRED)
+
+find_package(nmea_msgs REQUIRED)
+
+
+
+
 add_library(gnss_someip_lib INTERFACE IMPORTED)
 target_link_libraries(gnss_someip_lib 
     INTERFACE 
@@ -36,8 +45,11 @@ add_executable(${SERVER_TARGET_NAME}
     src/main.cpp
 )
 
+# target_include_directories(${sensor_msgs_INCLUDE_DIRS})
+
 target_include_directories(${SERVER_TARGET_NAME} PRIVATE 
     ${COMMONAPI_INCLUDE_DIRS}
+    ${nmea_msgs_INCLUDE_DIRS}
     )
 
 target_link_libraries(${SERVER_TARGET_NAME} PRIVATE

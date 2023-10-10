@@ -2,7 +2,7 @@
 
 #include <gnss_someip_lib/msg/gnss_data.hpp>
 
-using GpsDataMsg = gnss_someip_lib::msg::GnssData;
+using  GpsDataMsg = gnss_someip_lib::msg::GnssData;
 
 class GnssTopicSubsriber : public rclcpp::Node
 {

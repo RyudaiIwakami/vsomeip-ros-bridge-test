@@ -12,7 +12,7 @@ if(NOT COMMON_API_GENERATORS_FOUND)
 
     find_package(PackageHandleStandardArgs REQUIRED)
 
-    find_package_handle_standard_args(CommonAPIGenerators DEFAULT_MSG COMMON_API_CORE_GENERATOR COMMON_API_SOMEIP_GENERATOR)
+    find_package_handle_standard_args(CommonAPITools DEFAULT_MSG COMMON_API_CORE_GENERATOR COMMON_API_SOMEIP_GENERATOR)
 
     mark_as_advanced(COMMON_API_GENERATORS_FOUND COMMON_API_CORE_GENERATOR COMMON_API_SOMEIP_GENERATOR)
 endif()

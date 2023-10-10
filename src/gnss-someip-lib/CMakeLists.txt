@@ -7,6 +7,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(sensor_msgs_INCLUDE_DIRS /opt/ros/humble/include)
 
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
@@ -17,12 +18,17 @@ find_package(FrancaRosTools REQUIRED)
 find_package(CommonAPI REQUIRED)
 find_package(CommonAPI-SomeIP REQUIRED)
 
+find_package(sensor_msgs REQUIRED)
+
+
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 
+
+
 # TODO: find a way to use add_custom_command
-# add_custom_command(
+# add_custom_command(sleep_client and 
 #     OUTPUT
 #         ${CMAKE_BINARY_DIR}/ros/msg/Dop.msg
 #         ${CMAKE_BINARY_DIR}/ros/msg/Fix.msg
@@ -53,6 +59,7 @@ rosidl_generate_interfaces(${GNSS_MSG_TARGET_NAME}
     ${TIME_MSG}
     ${POSITION_MSG}
     ${GNSS_DATA_MSG}
+    LIBRARY_NAME ${PROJECT_NAME}
 )
 
 set(GNSS_FILES 
@@ -96,6 +103,7 @@ target_include_directories(${GNSS_TARGET_NAME}
     PRIVATE 
         $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/gen>
         ${COMMONAPI_INCLUDE_DIRS}
+        ${sensor_msgs_INCLUDE_DIRS}
     PUBLIC 
         $<INSTALL_INTERFACE:${GNSS_INSTALL_INCLUDEDIR}>
 )

@@ -31,7 +31,7 @@ class GnssSomeIpReporter : public rclcpp::Node
 
     static constexpr auto domain = "local";
     static constexpr auto instance = "GnssServer";
-    static constexpr auto timer_duration = 2s;
+    static constexpr auto timer_duration = 5s;
 
     static constexpr auto topic = "GPSD";
     static constexpr auto qos = 10;
@@ -41,7 +41,7 @@ public:
         : Node(node_name)
         , someip_provider(std::make_shared<T>())
     {
-        if(register_someip_service()) {
+          if(register_someip_service()) {
             RCLCPP_INFO(this->get_logger(), "SOME/IP GnssServer has been registered");
 
             gpsd_data_subscription = this->create_subscription<GnssDataMsg>(topic, qos, std::bind(&GnssSomeIpReporter::on_gpsd_data, this, std::placeholders::_1));
@@ -53,7 +53,7 @@ public:
 
                 someip_provider->fireDataEvent(gps_data);
             });
-        }
+         }  
     }
 
 protected:

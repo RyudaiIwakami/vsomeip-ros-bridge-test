@@ -1,7 +1,7 @@
 #pragma once
 
 #include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/string.hpp"
+// #include "std_msgs/msg/string.hpp"
 
 #include <gnss_someip_lib/msg/gnss_data.hpp>
 
