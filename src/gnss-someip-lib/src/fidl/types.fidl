@@ -32,4 +32,8 @@ typeCollection common {
         Position position 
         Time time
     }
+
+    struct Str{
+        String str
+    }
 }

@@ -7,7 +7,7 @@ interface GnssServer {
 
     broadcast data {
         out {
-            GnssData data
+            String str
         }
     }
 } 

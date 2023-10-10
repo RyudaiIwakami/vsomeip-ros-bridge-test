@@ -7,7 +7,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(sensor_msgs_INCLUDE_DIRS /opt/ros/humble/include)
+# set(sensor_msgs_INCLUDE_DIRS /opt/ros/humble/include)
 
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
@@ -19,6 +19,7 @@ find_package(CommonAPI REQUIRED)
 find_package(CommonAPI-SomeIP REQUIRED)
 
 find_package(sensor_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
 
 
 include(GNUInstallDirs)
@@ -95,6 +96,7 @@ add_library(${GNSS_TARGET_NAME} SHARED ${GNSS_FILES})
 target_link_libraries(${GNSS_TARGET_NAME} PUBLIC 
     CommonAPI
     CommonAPI-SomeIP
+    # std_msgs
 )
 
 set(GNSS_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR}/gnss-${PROJECT_VERSION_MAJOR}/)
@@ -104,6 +106,7 @@ target_include_directories(${GNSS_TARGET_NAME}
         $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/gen>
         ${COMMONAPI_INCLUDE_DIRS}
         ${sensor_msgs_INCLUDE_DIRS}
+        ${std_msgs_INCLUDE_DIRS}
     PUBLIC 
         $<INSTALL_INTERFACE:${GNSS_INSTALL_INCLUDEDIR}>
 )

@@ -6,14 +6,38 @@
 
 #include <rclcpp/rclcpp.hpp>
 
-//test
+#include "std_msgs/msg/string.hpp"
+
+// #include <chrono>
+
+// #include <v0/gnss/common.hpp>
+
+// using GnssDataMsg = std_msgs::msg::String;
+// using GnssData = std::string;
+
+// namespace Types::Conversion {
+
+// /**
+//  * @brief converts ROS2 MSG to CommonAPI generated data type 
+//  * 
+//  * @param gps_data 
+//  * @return GnssData 
+//  */
+// GnssData to_capi_type(const GnssDataMsg & gps_data) {
+//     GnssData gnss_data;
+//     gnss_data.setStr(gps_data.data);
+
+//     return gnss_data;
+// }
+// }
 class GnssSomeIpProvider : public v0::gnss::GnssServerStubDefault {
 
 public:
     GnssSomeIpProvider() = default;
     ~GnssSomeIpProvider() = default;
+    
 
-    void fireDataEvent(const GnssDataMsg & gps_data) {
+    void fireDataEvent(const std_msgs::msg::String & gps_data) {
         
         RCLCPP_INFO(rclcpp::get_logger("GNSS_SOMEIP_Provider"), "Sending gnss data over SOME/IP.");
 
@@ -44,7 +68,7 @@ public:
           if(register_someip_service()) {
             RCLCPP_INFO(this->get_logger(), "SOME/IP GnssServer has been registered");
 
-            gpsd_data_subscription = this->create_subscription<GnssDataMsg>(topic, qos, std::bind(&GnssSomeIpReporter::on_gpsd_data, this, std::placeholders::_1));
+            gpsd_data_subscription = this->create_subscription<std_msgs::msg::String>(topic, qos, std::bind(&GnssSomeIpReporter::on_gpsd_data, this, std::placeholders::_1));
 
             publish_timer = this->create_wall_timer(timer_duration, [this]() {            
                 RCLCPP_INFO(this->get_logger(), "Timer: Broadcast GNSS data over SOME/IP");
@@ -68,7 +92,7 @@ protected:
         return true;
     }
 
-    void on_gpsd_data(const GnssDataMsg & msg) 
+    void on_gpsd_data(const std_msgs::msg::String & msg) 
     {
         std::lock_guard<std::mutex> guard(mutex);
 
@@ -83,7 +107,7 @@ private:
 
     std::mutex mutex;
 
-    GnssDataMsg gps_data;
+    std_msgs::msg::String gps_data;
 
-    rclcpp::Subscription<GnssDataMsg>::SharedPtr gpsd_data_subscription;
+    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr gpsd_data_subscription;
 };

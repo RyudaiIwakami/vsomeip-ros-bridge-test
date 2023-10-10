@@ -6,7 +6,7 @@
 #include <types/conversion.h>
 #include <optional>
 
-#include <iostream>
+// #include <iostream>
 
 
 using GpsDataMsg = gnss_someip_lib::msg::GnssData;
@@ -43,7 +43,7 @@ protected:
     void init() {
         if(!proxy_)
         {
-            std::cout << "Hello, World!" << std::endl;
+            // std::cout << "Hello, World!" << std::endl;
 
             // RCLCPP_ERROR(this->get_logger(), "Not able to initialize SOME/IP proxy for GNSS");
             //TODO: handle error case correctly
