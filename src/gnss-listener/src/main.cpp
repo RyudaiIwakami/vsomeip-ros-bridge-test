@@ -2,7 +2,9 @@
 
 #include <gnss_someip_lib/msg/gnss_data.hpp>
 
-using  GpsDataMsg = gnss_someip_lib::msg::GnssData;
+#include "std_msgs/msg/string.hpp"
+
+using  GpsDataMsg = std_msgs::msg::String;
 
 class GnssTopicSubsriber : public rclcpp::Node
 {
@@ -14,7 +16,7 @@ class GnssTopicSubsriber : public rclcpp::Node
 public:
     GnssTopicSubsriber() : Node(node_name)
     {
-      subscription = this->create_subscription<GpsDataMsg>(topic, qos, std::bind(&GnssTopicSubsriber::gnss_topic_callback, this, std::placeholders::_1));
+      subscription = this->create_subscription<GpsDataMsg>(topic, qos, std::bind(&GnssTopicSubsriber::topic_callback, this, std::placeholders::_1));
     }
 
 private:
