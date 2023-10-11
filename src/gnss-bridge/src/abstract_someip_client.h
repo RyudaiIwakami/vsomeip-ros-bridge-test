@@ -2,6 +2,7 @@
 
 #include <CommonAPI/CommonAPI.hpp>
 #include <v0/gnss/GnssServerProxy.hpp>
+#include "std_msgs/msg/string.hpp"
 
 #include <types/conversion.h>
 #include <optional>
@@ -9,8 +10,8 @@
 // #include <iostream>
 
 
-using GpsDataMsg = gnss_someip_lib::msg::GnssData;
-using GnssData = v0::gnss::common::GnssData;
+using GpsDataMsg = std_msgs::msg::String;
+using GnssData = v0::gnss::common::Str;
 
 template<template<typename ...> class P>
 class AbstractSomeIpClient 
@@ -83,7 +84,7 @@ public:
     }
 
     void onAvailable() override {
-        proxy()->getDataEvent().subscribe([this](const GnssData & data) {
+        proxy()->getDataEvent().subscribe([this](const std::string & data) {
 
             auto message = Types::Conversion::from_capi_type(data);
 

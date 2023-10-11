@@ -1,12 +1,12 @@
 #pragma once
 
 #include "rclcpp/rclcpp.hpp"
-// #include "std_msgs/msg/string.hpp"
+#include "std_msgs/msg/string.hpp"
 
 #include <gnss_someip_lib/msg/gnss_data.hpp>
 
-using GpsDataMsg = gnss_someip_lib::msg::GnssData;
-using GnssData = v0::gnss::common::GnssData;
+using GpsDataMsg = std_msgs::msg::String;
+using GnssData = v0::gnss::common::Str;
 template <typename SomeIpClient> 
 class SomeIpPublisher : public rclcpp::Node
 {

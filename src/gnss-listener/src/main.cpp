@@ -18,13 +18,19 @@ public:
     }
 
 private:
-    void gnss_topic_callback(const GpsDataMsg & msg) const
-    {
-      RCLCPP_INFO(this->get_logger(), "GNSS position latitude %f, longitude %f", 
-          msg.position.fix.latitude,
-          msg.position.fix.longitude
-        );
-    }
+    // void gnss_topic_callback(const GpsDataMsg & msg) const
+    // {
+    //   RCLCPP_INFO(this->get_logger(), "GNSS position latitude %f, longitude %f", 
+    //       msg.position.fix.latitude,
+    //       msg.position.fix.longitude
+    //     );
+    // }
+
+     void topic_callback(const std_msgs::msg::String::SharedPtr msg) const
+  {
+    RCLCPP_INFO(this->get_logger(), "I heard: '%s'", msg->data.c_str());
+  }
+  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
 
     rclcpp::Subscription<GpsDataMsg>::SharedPtr subscription;
 };

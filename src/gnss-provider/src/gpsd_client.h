@@ -113,8 +113,8 @@
 
 #include "std_msgs/msg/string.hpp"
 
-using GnssDataMsg = std_msgs::msg::String;
-using GnssData = std::string;
+// using GnssDataMsg = std_msgs::msg::String;
+// using GnssData = std::string;
 
 // namespace Types::Conversion {
 // GnssDataMsg to_gnss_data_msg(const std_msgs::msg::String * gps_data) {
@@ -132,7 +132,7 @@ class GpsdClient : public rclcpp::Node {
 public:
     GpsdClient() : Node(node_name)
     {
-        publisher = this->create_publisher<std_msgs::msg::String>(topic, qos);
+        publisher = this->create_publisher<GnssDataMsg>(topic, qos);
         // if(!init()) {
         //     RCLCPP_WARN(this->get_logger(), "No connection to gpsd");
         // }
@@ -190,6 +190,6 @@ private:
 
     std::mutex mutex;
     rclcpp::TimerBase::SharedPtr timer;
-    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher;
+    rclcpp::Publisher<GnssDataMsg>::SharedPtr publisher;
     size_t count_;
 };

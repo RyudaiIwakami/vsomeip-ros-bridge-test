@@ -8,9 +8,10 @@
 
 #include <libgpsmm.h>
 
+
 using namespace std::chrono;
 using GnssDataMsg = std_msgs::msg::String;
-using GnssData = std::string;
+using GnssData = v0::gnss::common::Str;
 
 namespace Types::Conversion {
 
@@ -20,32 +21,14 @@ namespace Types::Conversion {
  * @param gps_data 
  * @return GnssData 
  */
-GnssData to_capi_type(const GnssDataMsg & gps_data) {
+std::string to_capi_type(const GnssDataMsg & gps_data) {
     GnssData gnss_data;
-
-    // v0::gnss::common::Position position;
-    // v0::gnss::common::Time time;
-    // v0::gnss::common::Fix fix; 
-    // v0::gnss::common::Dop dop;
-
-    // fix.setLatitude(gps_data.position.fix.latitude);
-    // fix.setLongitude(gps_data.position.fix.longitude);
-    
-    // dop.setHdop(gps_data.position.dop.hdop);
-    // dop.setVdop(gps_data.position.dop.vdop);
-    // dop.setPdop(gps_data.position.dop.pdop);
-
-    // position.setSatellites_visible(gps_data.position.satellites_visible);
-    // position.setSatellites_used(gps_data.position.satellites_used);
-    // position.setDop(dop);
-    // position.setFix(fix);
-
-    // gnss_data.setPosition(position);
-    // gnss_data.setTime(time);
 
     gnss_data.setStr(gps_data.data);
 
-    return gnss_data;
+    std::string str = gnss_data.getStr();
+
+    return str;
 }
 
 /**
@@ -54,21 +37,14 @@ GnssData to_capi_type(const GnssDataMsg & gps_data) {
  * @param gps_data 
  * @return GnssData 
  */
-// GnssDataMsg from_capi_type(const GnssData & gnss_data) {
+ GnssDataMsg from_capi_type(const std::string & gnss_data) {
     
-//     GnssDataMsg gps_data_msg; 
+    GnssDataMsg gps_data_msg; 
 
-//     auto position = gnss_data.getPosition();
+    gps_data_msg.data = gnss_data;
 
-//     gps_data_msg.position.fix.latitude = position.getFix().getLatitude();
-//     gps_data_msg.position.fix.longitude = position.getFix().getLongitude();
-//     gps_data_msg.position.dop.hdop = position.getDop().getHdop();
-//     gps_data_msg.position.dop.vdop = position.getDop().getVdop();
-//     gps_data_msg.position.satellites_visible = position.getSatellites_visible();
-//     gps_data_msg.position.satellites_used = position.getSatellites_used();
-
-//     return gps_data_msg;
-// }
+    return gps_data_msg;
+ }
 
 
 } // namespace TypeConversion

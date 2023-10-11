@@ -8,7 +8,9 @@
 
 #include "std_msgs/msg/string.hpp"
 
-// #include <chrono>
+#include <types/conversion.h>
+
+#include <chrono>
 
 // #include <v0/gnss/common.hpp>
 
@@ -68,7 +70,7 @@ public:
           if(register_someip_service()) {
             RCLCPP_INFO(this->get_logger(), "SOME/IP GnssServer has been registered");
 
-            gpsd_data_subscription = this->create_subscription<std_msgs::msg::String>(topic, qos, std::bind(&GnssSomeIpReporter::on_gpsd_data, this, std::placeholders::_1));
+            gpsd_data_subscription = this->create_subscription<GnssDataMsg>(topic, qos, std::bind(&GnssSomeIpReporter::on_gpsd_data, this, std::placeholders::_1));
 
             publish_timer = this->create_wall_timer(timer_duration, [this]() {            
                 RCLCPP_INFO(this->get_logger(), "Timer: Broadcast GNSS data over SOME/IP");
@@ -92,7 +94,7 @@ protected:
         return true;
     }
 
-    void on_gpsd_data(const std_msgs::msg::String & msg) 
+    void on_gpsd_data(const GnssDataMsg & msg) 
     {
         std::lock_guard<std::mutex> guard(mutex);
 

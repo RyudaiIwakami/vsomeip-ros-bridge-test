@@ -5,7 +5,7 @@ project(gnss_provider VERSION 0.0.2)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
+set(std_msgs_INCLUDE_DIRS /opt/ros/humble/include)
 
 
 include(GNUInstallDirs)
@@ -23,8 +23,6 @@ find_package(concurrentqueue REQUIRED)
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-
-
 
 find_package(std_msgs REQUIRED)
 
@@ -46,7 +44,7 @@ add_executable(${SERVER_TARGET_NAME}
 )
 
 
-# target_include_directories(${sensor_msgs_INCLUDE_DIRS})
+# target_include_directories(${std_msgs_INCLUDE_DIRS})
 
 target_include_directories(${SERVER_TARGET_NAME} PRIVATE 
     ${COMMONAPI_INCLUDE_DIRS}
@@ -61,8 +59,10 @@ target_link_libraries(${SERVER_TARGET_NAME} PRIVATE
     concurrentqueue::concurrentqueue
     PkgConfig::gps
     gnss_someip_lib
-    std_msgs
+    ${std_msgs_LIBRARIES}
 )
+
+
 
 target_compile_features(${SERVER_TARGET_NAME} PRIVATE cxx_std_17)
 target_compile_definitions(${SERVER_TARGET_NAME} PRIVATE -DGNSS_SERVER_VERSION="${PROJECT_VERSION}")
