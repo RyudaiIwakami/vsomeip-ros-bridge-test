@@ -125,10 +125,10 @@
 // } // namespace Types::Conversion
 class GpsdClient : public rclcpp::Node {
     static constexpr auto node_name = "GPSD_Client_node";
-    static constexpr auto waiting_time = 10000000;
+    static constexpr auto waiting_time = 1000000;
     static constexpr auto topic = "GPSD";
     static constexpr auto qos = 10;
-    static constexpr auto gpsd_read_timer_delay = 500ms;
+    static constexpr auto gpsd_read_timer_delay = 1s;
 public:
     GpsdClient() : Node(node_name)
     {

@@ -57,7 +57,7 @@ class GnssSomeIpReporter : public rclcpp::Node
 
     static constexpr auto domain = "local";
     static constexpr auto instance = "GnssServer";
-    static constexpr auto timer_duration = 5s;
+    static constexpr auto timer_duration = 1s;
 
     static constexpr auto topic = "GPSD";
     static constexpr auto qos = 10;
