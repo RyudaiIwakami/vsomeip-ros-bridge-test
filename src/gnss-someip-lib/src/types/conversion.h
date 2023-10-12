@@ -1,13 +1,8 @@
 #pragma once 
 
 #include <v0/gnss/common.hpp>
-
-// #include <gnss_someip_lib/msg/gnss_data.hpp>
-
 #include "std_msgs/msg/string.hpp"
-
 #include <libgpsmm.h>
-
 
 using namespace std::chrono;
 using GnssDataMsg = std_msgs::msg::String;

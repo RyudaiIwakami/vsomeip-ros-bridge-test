@@ -12,26 +12,8 @@
 
 #include <chrono>
 
-// #include <v0/gnss/common.hpp>
 
-// using GnssDataMsg = std_msgs::msg::String;
-// using GnssData = std::string;
 
-// namespace Types::Conversion {
-
-// /**
-//  * @brief converts ROS2 MSG to CommonAPI generated data type 
-//  * 
-//  * @param gps_data 
-//  * @return GnssData 
-//  */
-// GnssData to_capi_type(const GnssDataMsg & gps_data) {
-//     GnssData gnss_data;
-//     gnss_data.setStr(gps_data.data);
-
-//     return gnss_data;
-// }
-// }
 class GnssSomeIpProvider : public v0::gnss::GnssServerStubDefault {
 
 public:
@@ -62,6 +44,9 @@ class GnssSomeIpReporter : public rclcpp::Node
     static constexpr auto topic = "GPSD";
     static constexpr auto qos = 10;
 
+    std::chrono::system_clock::time_point  start, end;
+    std::time_t time_stamp;
+    
 public:
     GnssSomeIpReporter()
         : Node(node_name)
@@ -76,8 +61,9 @@ public:
                 RCLCPP_INFO(this->get_logger(), "Timer: Broadcast GNSS data over SOME/IP");
         
                 std::lock_guard<std::mutex> guard(mutex);
-
+        
                 someip_provider->fireDataEvent(gps_data);
+                start = std::chrono::system_clock::now(); 
             });
          }  
     }
@@ -96,7 +82,9 @@ protected:
 
     void on_gpsd_data(const GnssDataMsg & msg) 
     {
+
         std::lock_guard<std::mutex> guard(mutex);
+        end = std::chrono::system_clock::now();  
 
         RCLCPP_INFO(this->get_logger(), "Received GPS raw data from GpsdClient node");
 

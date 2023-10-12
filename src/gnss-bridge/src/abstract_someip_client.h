@@ -7,6 +7,9 @@
 #include <types/conversion.h>
 #include <optional>
 
+#include<iostream>
+#include<fstream>
+
 // #include <iostream>
 
 
@@ -74,6 +77,9 @@ class GnssSomeIpClient : public GnssSomeIpProxyWrapper
     static constexpr auto domain = "local";
     static constexpr auto instance = "GnssServer";
 
+    std::chrono::system_clock::time_point end;
+    std::time_t time_stamp;
+
     using MessageCallback = std::function<void(const GpsDataMsg & message)>;
 
 public:
@@ -84,10 +90,11 @@ public:
     }
 
     void onAvailable() override {
+            //end
         proxy()->getDataEvent().subscribe([this](const std::string & data) {
 
             auto message = Types::Conversion::from_capi_type(data);
-
+            end = std::chrono::system_clock::now(); 
             message_callback(message);
         });
     }
