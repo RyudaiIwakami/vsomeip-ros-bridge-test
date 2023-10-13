@@ -1,9 +1,15 @@
 #pragma once
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/serialization.hpp>
-#include <fstream>
+
 #include <string>
 #include <vector>
+
+
+#include <iostream>
+#include <chrono>
+#include <fstream>
+#include <iomanip>
 
 
 #include "std_msgs/msg/string.hpp"
@@ -17,7 +23,12 @@ class GpsdClient : public rclcpp::Node {
 
     std::chrono::system_clock::time_point  start;
     std::time_t time_stamp;
+    int i = 0;
+
 public:
+
+    std::ofstream startFile;
+
     GpsdClient() : Node(node_name)
     {
         publisher = this->create_publisher<GnssDataMsg>(topic, qos);
@@ -36,7 +47,11 @@ public:
       RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
 
       publisher->publish(message);
-      start = std::chrono::system_clock::now();
+      auto start = std::chrono::high_resolution_clock::now();
+      auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
+       startFile.open("start_times.txt", std::ios::app);
+      startFile << "Run " << std::setw(2) << (i + 1) << ": " << start_time << " microseconds" << std::endl;
+      startFile.close();
       //タイムスタンプをファイルに書き込む
     }
 

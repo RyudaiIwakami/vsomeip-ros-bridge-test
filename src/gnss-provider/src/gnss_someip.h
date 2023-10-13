@@ -10,7 +10,11 @@
 
 #include <types/conversion.h>
 
+
+#include <iostream>
 #include <chrono>
+#include <fstream>
+#include <iomanip>
 
 
 
@@ -44,14 +48,16 @@ class GnssSomeIpReporter : public rclcpp::Node
     static constexpr auto topic = "GPSD";
     static constexpr auto qos = 10;
 
-    std::chrono::system_clock::time_point  start, end;
+    std::chrono::system_clock::time_point  end;
     std::time_t time_stamp;
+    int i = 0;
     
 public:
     GnssSomeIpReporter()
         : Node(node_name)
         , someip_provider(std::make_shared<T>())
     {
+         
           if(register_someip_service()) {
             RCLCPP_INFO(this->get_logger(), "SOME/IP GnssServer has been registered");
 
@@ -63,12 +69,14 @@ public:
                 std::lock_guard<std::mutex> guard(mutex);
         
                 someip_provider->fireDataEvent(gps_data);
-                start = std::chrono::system_clock::now(); 
+                // start = std::chrono::system_clock::now(); 
             });
          }  
     }
 
 protected:
+
+    std::ofstream endFile;
 
     bool register_someip_service() {
         if(!CommonAPI::Runtime::get()->registerService(domain,instance, someip_provider)) {
@@ -84,7 +92,11 @@ protected:
     {
 
         std::lock_guard<std::mutex> guard(mutex);
-        end = std::chrono::system_clock::now();  
+        auto end = std::chrono::high_resolution_clock::now();
+        auto end_time = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch().count();
+        endFile.open("end_times.txt", std::ios::app);
+        endFile << "Run " << std::setw(2) << (i + 1) << ": " << end_time << " microseconds" << std::endl;
+        endFile.close();
 
         RCLCPP_INFO(this->get_logger(), "Received GPS raw data from GpsdClient node");
 
