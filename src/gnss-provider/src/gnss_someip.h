@@ -48,28 +48,35 @@ class GnssSomeIpReporter : public rclcpp::Node
     static constexpr auto topic = "GPSD";
     static constexpr auto qos = 10;
 
-    std::chrono::system_clock::time_point  end;
+    std::chrono::system_clock::time_point  start,end;
     std::time_t time_stamp;
-    int i = 0;
     
 public:
     GnssSomeIpReporter()
         : Node(node_name)
         , someip_provider(std::make_shared<T>())
     {
+
          
           if(register_someip_service()) {
             RCLCPP_INFO(this->get_logger(), "SOME/IP GnssServer has been registered");
 
             gpsd_data_subscription = this->create_subscription<GnssDataMsg>(topic, qos, std::bind(&GnssSomeIpReporter::on_gpsd_data, this, std::placeholders::_1));
 
+            
+
             publish_timer = this->create_wall_timer(timer_duration, [this]() {            
                 RCLCPP_INFO(this->get_logger(), "Timer: Broadcast GNSS data over SOME/IP");
         
                 std::lock_guard<std::mutex> guard(mutex);
+                std::ofstream startFile;
         
                 someip_provider->fireDataEvent(gps_data);
-                // start = std::chrono::system_clock::now(); 
+                auto start = std::chrono::high_resolution_clock::now();
+                auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
+                startFile.open("start_times_SOMEIP.txt", std::ios::app);
+                startFile << "Run " << std::setw(2) << (time_count_SOMEIP_start) << ": " << start_time << " microseconds" << std::endl;
+                startFile.close(); 
             });
          }  
     }
@@ -94,8 +101,8 @@ protected:
         std::lock_guard<std::mutex> guard(mutex);
         auto end = std::chrono::high_resolution_clock::now();
         auto end_time = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch().count();
-        endFile.open("end_times.txt", std::ios::app);
-        endFile << "Run " << std::setw(2) << (i + 1) << ": " << end_time << " microseconds" << std::endl;
+        endFile.open("end_times_ROS2.txt", std::ios::app);
+        endFile << "Run " << std::setw(2) << (time_count_ROS2_end++) << ": " << end_time << " microseconds" << std::endl;
         endFile.close();
 
         RCLCPP_INFO(this->get_logger(), "Received GPS raw data from GpsdClient node");
@@ -112,4 +119,7 @@ private:
     std_msgs::msg::String gps_data;
 
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr gpsd_data_subscription;
+
+    int time_count_ROS2_end = 0;
+    int time_count_SOMEIP_start = 0;
 };

@@ -77,7 +77,7 @@ class GnssSomeIpClient : public GnssSomeIpProxyWrapper
     static constexpr auto domain = "local";
     static constexpr auto instance = "GnssServer";
 
-    std::chrono::system_clock::time_point end;
+    std::chrono::system_clock::time_point  end;
     std::time_t time_stamp;
 
     using MessageCallback = std::function<void(const GpsDataMsg & message)>;
@@ -89,16 +89,26 @@ public:
         message_callback = std::move(callback);
     }
 
+    std::ofstream endFile;
+
     void onAvailable() override {
-            //end
-        proxy()->getDataEvent().subscribe([this](const std::string & data) {
+
+            
+            proxy()->getDataEvent().subscribe([this](const std::string & data) {
 
             auto message = Types::Conversion::from_capi_type(data);
-            end = std::chrono::system_clock::now(); 
+
+            auto end = std::chrono::high_resolution_clock::now();
+            auto end_time = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch().count();
+            endFile.open("end_times_SOMEIP.txt", std::ios::app);
+            endFile << "Run " << std::setw(2) << (time_count_SOMEIP_end++) << ": " << end_time << " microseconds" << std::endl;
+            endFile.close();
+            
             message_callback(message);
         });
     }
 
 private:
     MessageCallback message_callback;
+    int time_count_SOMEIP_end = 0;
 };
