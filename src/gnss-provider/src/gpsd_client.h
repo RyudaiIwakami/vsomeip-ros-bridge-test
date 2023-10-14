@@ -21,8 +21,8 @@ class GpsdClient : public rclcpp::Node {
     static constexpr auto qos = 10;
     static constexpr auto gpsd_read_timer_delay = 1s;
 
-    std::chrono::system_clock::time_point  start;
-    std::time_t time_stamp;
+    // std::chrono::system_clock::time_point  start;
+    // std::time_t time_stamp;
 
 public:
 
@@ -49,7 +49,7 @@ public:
       auto start = std::chrono::high_resolution_clock::now();
       auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
       startFile.open("start_times_ROS2.txt", std::ios::app);
-      startFile << "Run " << std::setw(2) << (time_count_ROS2_start) << ": " << start_time << " microseconds" << std::endl;
+      startFile << "Run " << std::setw(2) << (time_count_ROS2_start++) << ": " << start_time << " microseconds" << std::endl;
       startFile.close();
       //タイムスタンプをファイルに書き込む
     }

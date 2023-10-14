@@ -48,8 +48,8 @@ class GnssSomeIpReporter : public rclcpp::Node
     static constexpr auto topic = "GPSD";
     static constexpr auto qos = 10;
 
-    std::chrono::system_clock::time_point  start,end;
-    std::time_t time_stamp;
+    // std::chrono::system_clock::time_point  start,end;
+    // std::time_t time_stamp;
     
 public:
     GnssSomeIpReporter()
@@ -75,7 +75,7 @@ public:
                 auto start = std::chrono::high_resolution_clock::now();
                 auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
                 startFile.open("start_times_SOMEIP.txt", std::ios::app);
-                startFile << "Run " << std::setw(2) << (time_count_SOMEIP_start) << ": " << start_time << " microseconds" << std::endl;
+                startFile << "Run " << std::setw(2) << (time_count_SOMEIP_start++) << ": " << start_time << " microseconds" << std::endl;
                 startFile.close(); 
             });
          }  
@@ -83,7 +83,7 @@ public:
 
 protected:
 
-    std::ofstream endFile;
+    
 
     bool register_someip_service() {
         if(!CommonAPI::Runtime::get()->registerService(domain,instance, someip_provider)) {
@@ -99,6 +99,7 @@ protected:
     {
 
         std::lock_guard<std::mutex> guard(mutex);
+        std::ofstream endFile;
         auto end = std::chrono::high_resolution_clock::now();
         auto end_time = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch().count();
         endFile.open("end_times_ROS2.txt", std::ios::app);
