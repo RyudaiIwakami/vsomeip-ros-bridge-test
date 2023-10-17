@@ -19,14 +19,14 @@ class GpsdClient : public rclcpp::Node {
     static constexpr auto waiting_time = 1000000;
     static constexpr auto topic = "GPSD";
     static constexpr auto qos = 10;
-    static constexpr auto gpsd_read_timer_delay = 1s;
+    static constexpr auto gpsd_read_timer_delay = 50ms;
 
     // std::chrono::system_clock::time_point  start;
     // std::time_t time_stamp;
 
 public:
 
-    std::ofstream startFile;
+    
 
     GpsdClient() : Node(node_name)
     {
@@ -41,16 +41,16 @@ public:
     
     void timer_callback()
     {
+    //   startFile.open("start_times_ROS2.txt", std::ios::app);
       auto message = std_msgs::msg::String();
       message.data = "Hello, world! " + std::to_string(count_++);
       RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
 
       publisher->publish(message);
-      auto start = std::chrono::high_resolution_clock::now();
-      auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
-      startFile.open("start_times_ROS2.txt", std::ios::app);
-      startFile << "Run " << std::setw(2) << (time_count_ROS2_start++) << ": " << start_time << " microseconds" << std::endl;
-      startFile.close();
+    //   auto start = std::chrono::high_resolution_clock::now();
+    //   auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
+    //   startFile << "Run " << std::setw(2) << (time_count_ROS2_start++) << ": " << start_time << " microseconds" << std::endl;
+    // //   startFile.close();
       //タイムスタンプをファイルに書き込む
     }
 
@@ -60,5 +60,6 @@ private:
     rclcpp::TimerBase::SharedPtr timer;
     rclcpp::Publisher<GnssDataMsg>::SharedPtr publisher;
     size_t count_;
-    int time_count_ROS2_start = 0;
+    // int time_count_ROS2_start = 0;
+    // std::ofstream startFile;
 };

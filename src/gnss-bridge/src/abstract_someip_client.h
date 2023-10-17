@@ -7,8 +7,11 @@
 #include <types/conversion.h>
 #include <optional>
 
-#include<iostream>
-#include<fstream>
+
+#include <iostream>
+#include <chrono>
+#include <fstream>
+#include <iomanip>
 
 // #include <iostream>
 
@@ -16,11 +19,15 @@
 using GpsDataMsg = std_msgs::msg::String;
 using GnssData = v0::gnss::common::Str;
 
+// std::ofstream endFile;
+
 template<template<typename ...> class P>
 class AbstractSomeIpClient 
 {
     using ProxyClass = P<>;
     using ProxyClassPtr = std::shared_ptr<ProxyClass>;
+    
+    
 
 public: 
     AbstractSomeIpClient(std::string domain, std::string instance) 
@@ -28,6 +35,7 @@ public:
     {
         init();
     }
+
 
     virtual std::optional<bool> available() {
         return (initialised()) ? std::make_optional(proxy_->isAvailable()) : std::nullopt;
@@ -70,6 +78,8 @@ private:
     ProxyClassPtr proxy_;
 };
 
+
+
 using GnssSomeIpProxyWrapper = AbstractSomeIpClient<v0::gnss::GnssServerProxy>;
 
 class GnssSomeIpClient : public GnssSomeIpProxyWrapper
@@ -77,17 +87,21 @@ class GnssSomeIpClient : public GnssSomeIpProxyWrapper
     static constexpr auto domain = "local";
     static constexpr auto instance = "GnssServer";
 
-    // std::chrono::system_clock::time_point end;
-    // std::time_t time_stamp;
+
+    // std::ofstream endFile;
 
     using MessageCallback = std::function<void(const GpsDataMsg & message)>;
+    
 
 public:
     GnssSomeIpClient() : GnssSomeIpProxyWrapper(domain, instance) {}
 
+    
     void setMessageCallback(MessageCallback callback) {
         message_callback = std::move(callback);
     }
+
+    
 
     
 
@@ -97,13 +111,13 @@ public:
             proxy()->getDataEvent().subscribe([this](const std::string & data) {
 
             auto message = Types::Conversion::from_capi_type(data);
-
-            std::ofstream endFile;
+            
             auto end = std::chrono::high_resolution_clock::now();
             auto end_time = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch().count();
+            std::ofstream endFile;
             endFile.open("end_times_SOMEIP.txt", std::ios::app);
-            endFile << "Run " << std::setw(2) << (time_count_SOMEIP_end++) << ": " << end_time << " microseconds" << std::endl;
-            endFile.close();
+            endFile << "Run" << std::setw(5) << (time_count_SOMEIP_end++) << ":" << end_time << std::endl;
+            // endFile.close();
             
             message_callback(message);
         });
@@ -112,4 +126,5 @@ public:
 private:
     MessageCallback message_callback;
     int time_count_SOMEIP_end = 0;
+    
 };
