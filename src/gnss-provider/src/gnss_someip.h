@@ -27,7 +27,7 @@ public:
 
     void fireDataEvent(const std_msgs::msg::String & gps_data) {
         
-        RCLCPP_INFO(rclcpp::get_logger("STRING_SOMEIP_Provider"), "Sending string data over SOME/IP.");
+        RCLCPP_INFO(rclcpp::get_logger("STR_SOMEIP_Provider"), "Sending string data over SOME/IP.");
 
         auto data = Types::Conversion::to_capi_type(gps_data);
 
@@ -89,7 +89,7 @@ protected:
     bool register_someip_service() {
         if(!CommonAPI::Runtime::get()->registerService(domain,instance, someip_provider)) {
             //TODO: handle error case correctly
-            RCLCPP_ERROR(this->get_logger(), "Failed to register SOME/IP GnssServer");
+            RCLCPP_ERROR(this->get_logger(), "Failed to register SOME/IP Server");
             return false;
         }
 
@@ -107,7 +107,7 @@ protected:
         // endFile << "Run " << std::setw(2) << (time_count_ROS2_end++) << ": " << end_time << " microseconds" << std::endl;
         // // endFile.close();
 
-        RCLCPP_INFO(this->get_logger(), "Received GPS raw data from GpsdClient node");
+        RCLCPP_INFO(this->get_logger(), "Received String data from STR_Client node");
 
         gps_data = msg;
     }
