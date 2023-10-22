@@ -10,7 +10,7 @@ using GnssData = v0::gnss::common::Str;
 template <typename SomeIpClient> 
 class SomeIpPublisher : public rclcpp::Node
 {
-    static constexpr auto Topic = "GNSS";
+    static constexpr auto Topic = "afterSOMEIP";
     static constexpr auto QoS = 10;
 
 public:

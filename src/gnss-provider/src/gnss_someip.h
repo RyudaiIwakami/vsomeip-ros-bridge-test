@@ -27,7 +27,7 @@ public:
 
     void fireDataEvent(const std_msgs::msg::String & gps_data) {
         
-        RCLCPP_INFO(rclcpp::get_logger("GNSS_SOMEIP_Provider"), "Sending gnss data over SOME/IP.");
+        RCLCPP_INFO(rclcpp::get_logger("STRING_SOMEIP_Provider"), "Sending string data over SOME/IP.");
 
         auto data = Types::Conversion::to_capi_type(gps_data);
 
@@ -39,13 +39,13 @@ public:
 template <typename T>
 class GnssSomeIpReporter : public rclcpp::Node
 {
-    static constexpr auto node_name = "GNSS_SOMEIP_Reporter";
+    static constexpr auto node_name = "STR_SOMEIP_Reporter";
 
     static constexpr auto domain = "local";
     static constexpr auto instance = "GnssServer";
-    static constexpr auto timer_duration = 50ms;
+    static constexpr auto timer_duration = 500ms;
 
-    static constexpr auto topic = "GPSD";
+    static constexpr auto topic = "beforeSOMEIP";
     static constexpr auto qos = 10;
 
     // std::chrono::system_clock::time_point  start,end;
@@ -59,14 +59,14 @@ public:
             
          
           if(register_someip_service()) {
-            RCLCPP_INFO(this->get_logger(), "SOME/IP GnssServer has been registered");
+            RCLCPP_INFO(this->get_logger(), "SOME/IP Server has been registered");
 
             gpsd_data_subscription = this->create_subscription<GnssDataMsg>(topic, qos, std::bind(&GnssSomeIpReporter::on_gpsd_data, this, std::placeholders::_1));
 
             
 
             publish_timer = this->create_wall_timer(timer_duration, [this]() {            
-                RCLCPP_INFO(this->get_logger(), "Timer: Broadcast GNSS data over SOME/IP");
+                RCLCPP_INFO(this->get_logger(), "Timer: Broadcast String data over SOME/IP");
         
                 std::lock_guard<std::mutex> guard(mutex);
                 std::ofstream startFile;

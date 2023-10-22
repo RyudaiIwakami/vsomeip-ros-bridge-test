@@ -8,9 +8,9 @@ using  GpsDataMsg = std_msgs::msg::String;
 
 class GnssTopicSubsriber : public rclcpp::Node
 {
-  static constexpr auto node_name = "GNSS_Topic_Subscriber";
+  static constexpr auto node_name = "STR_Topic_Subscriber";
 
-  static constexpr auto topic = "GNSS";
+  static constexpr auto topic = "afterSOMEIP";
   static constexpr auto qos = 10;
 
 public:

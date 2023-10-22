@@ -15,11 +15,11 @@
 #include "std_msgs/msg/string.hpp"
 
 class GpsdClient : public rclcpp::Node {
-    static constexpr auto node_name = "GPSD_Client_node";
+    static constexpr auto node_name = "STR_Client_node";
     static constexpr auto waiting_time = 1000000;
-    static constexpr auto topic = "GPSD";
+    static constexpr auto topic = "beforeSOMEIP";
     static constexpr auto qos = 10;
-    static constexpr auto gpsd_read_timer_delay = 50ms;
+    static constexpr auto gpsd_read_timer_delay = 500ms;
 
     // std::chrono::system_clock::time_point  start;
     // std::time_t time_stamp;
