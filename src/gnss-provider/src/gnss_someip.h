@@ -23,6 +23,8 @@ class GnssSomeIpProvider : public v0::gnss::GnssServerStubDefault {
 public:
     GnssSomeIpProvider() = default;
     ~GnssSomeIpProvider() = default;
+
+    int time_count_SOMEIP_start = 0;
     
 
     void fireDataEvent(const std_msgs::msg::String & gps_data) {
@@ -31,7 +33,14 @@ public:
 
         auto data = Types::Conversion::to_capi_type(gps_data);
 
+        // std::ofstream startFile;
+        // startFile.open("start_times_SOMEIP.txt", std::ios::app);
+
         GnssServerStub::fireDataEvent(data);
+
+        // auto start = std::chrono::high_resolution_clock::now();
+        // auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
+        // startFile << "Run" << std::setw(5) << (time_count_SOMEIP_start++) << ":" << start_time << std::endl;
     }
 
 };
@@ -69,15 +78,14 @@ public:
                 RCLCPP_INFO(this->get_logger(), "Timer: Broadcast String data over SOME/IP");
         
                 std::lock_guard<std::mutex> guard(mutex);
-                std::ofstream startFile;
-                startFile.open("start_times_SOMEIP.txt", std::ios::app);
+                // std::ofstream startFile;
+                // startFile.open("start_times_SOMEIP.txt", std::ios::app);
                 
                 someip_provider->fireDataEvent(gps_data);
                 
-                auto start = std::chrono::high_resolution_clock::now();
-                auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
-                startFile << "Run" << std::setw(5) << (time_count_SOMEIP_start++) << ":" << start_time << std::endl;
-                // startFile.close(); 
+                // auto start = std::chrono::high_resolution_clock::now();
+                // auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
+                // startFile << "Run" << std::setw(5) << (time_count_SOMEIP_start++) << ":" << start_time << std::endl;
             });
          }  
     }
@@ -103,6 +111,7 @@ protected:
         
         // auto end = std::chrono::high_resolution_clock::now();
         // auto end_time = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch().count();
+        // std::ofstream endFile;
         // endFile.open("end_times_ROS2.txt", std::ios::app);
         // endFile << "Run " << std::setw(2) << (time_count_ROS2_end++) << ": " << end_time << " microseconds" << std::endl;
         // // endFile.close();
@@ -122,9 +131,9 @@ private:
 
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr gpsd_data_subscription;
 
-    // int time_count_ROS2_end = 0;
-    int time_count_SOMEIP_start = 0;
+    int time_count_ROS2_end = 0;
+    // int time_count_SOMEIP_start = 0;
 
     
-    // std::ofstream endFile;
+    
 };
