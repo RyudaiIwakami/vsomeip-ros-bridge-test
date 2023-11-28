@@ -1,9 +1,9 @@
 #!/bin/bash
 
-dlt-daemon -p 50002 &
+dlt-daemon &
 routingmanagerd &
 
-export VSOMEIP_CONFIGURATION=/home/ros2-humble/vsomeip-ros-bridge/config/vsomeip-server.json
+
+source /src/install/setup.sh
 
 VSOMEIP_APPLICATION_NAME=gnss-server ros2 run gnss_provider gnss-server
-

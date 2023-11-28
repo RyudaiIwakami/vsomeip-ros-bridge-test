@@ -5,6 +5,6 @@ RUN mkdir /usr/share/nmea
 COPY simulation/gnss-sentences.nmea /usr/share/nmea/simulation.nmea
 
 COPY config/vsomeip-server.json /etc/vsomeip.json
-COPY config/init-server.sh /usr/bin/init_server.sh
+COPY config/init-server.sh /usr/bin/init.sh
 
-RUN chmod +x /usr/bin/init_server.sh
+RUN chmod +x /usr/bin/init.sh
