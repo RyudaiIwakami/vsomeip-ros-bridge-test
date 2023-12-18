@@ -20,20 +20,33 @@ typeCollection common {
         Double longitude
     }
 
-    struct Position {
-        UInt32 satellites_visible
-        UInt32 satellites_used
-        UInt32 status
-        Fix fix
-        Dop dop
-    }
-
-    struct GnssData {
-        Position position 
-        Time time
-    }
 
     struct Str{
         String str
+    }
+
+    struct Header{
+        UInt32 seq
+        Double time_stamp
+        String frame_id
+    }
+
+
+    struct Vector3{
+        Double x
+        Double y
+        Double z
+    }
+
+     struct Quaternion{
+        Double x
+        Double y
+        Double z
+        Double w
+    }
+
+    struct Tf2_transform{
+        Quaternion orientation
+        Vector3 vector
     }
 }

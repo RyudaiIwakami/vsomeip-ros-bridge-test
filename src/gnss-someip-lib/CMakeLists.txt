@@ -7,7 +7,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-# set(sensor_msgs_INCLUDE_DIRS /opt/ros/humble/include)
+# set(geometry_msgs_INCLUDE_DIRS /opt/ros/humble/include/geometry_msgs)
 
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
@@ -20,6 +20,7 @@ find_package(CommonAPI-SomeIP REQUIRED)
 
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
 
 include(GNUInstallDirs)
@@ -52,14 +53,13 @@ file(RELATIVE_PATH POSITION_MSG ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/
 file(RELATIVE_PATH DOP_MSG ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/ros/msg/Dop.msg)
 file(RELATIVE_PATH FIX_MSG ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/ros/msg/Fix.msg)
 file(RELATIVE_PATH TIME_MSG ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/ros/msg/Time.msg)
+file(RELATIVE_PATH GNSS_MSG ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/ros/msg/Gnss.msg)
 
 set(GNSS_MSG_TARGET_NAME gnss-msg)
 rosidl_generate_interfaces(${GNSS_MSG_TARGET_NAME}
     ${DOP_MSG}
     ${FIX_MSG}
     ${TIME_MSG}
-    ${POSITION_MSG}
-    ${GNSS_DATA_MSG}
     LIBRARY_NAME ${PROJECT_NAME}
 )
 
@@ -99,6 +99,8 @@ target_link_libraries(${GNSS_TARGET_NAME} PUBLIC
     # std_msgs
 )
 
+# include_directories(${geometry_msgs_INCLUDE_DIRS})
+
 set(GNSS_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR}/gnss-${PROJECT_VERSION_MAJOR}/)
 
 target_include_directories(${GNSS_TARGET_NAME} 
@@ -107,6 +109,8 @@ target_include_directories(${GNSS_TARGET_NAME}
         ${COMMONAPI_INCLUDE_DIRS}
         ${sensor_msgs_INCLUDE_DIRS}
         ${std_msgs_INCLUDE_DIRS}
+        ${geometry_msgs_INCLUDE_DIRS}
+        
     PUBLIC 
         $<INSTALL_INTERFACE:${GNSS_INSTALL_INCLUDEDIR}>
 )

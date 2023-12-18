@@ -10,6 +10,18 @@
 
 #include <types/conversion.h>
 
+#include "geometry_msgs/msg/pose.hpp"
+
+#include <tf2_ros/transform_listener.h>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+
+#include "tf2_ros/static_transform_broadcaster_node.hpp"
+
+#include "tf2_ros/transform_broadcaster.h"
+#include <tf2_ros/buffer.h>
+#include <tf2_msgs/msg/tf_message.hpp>
+
+
 
 #include <iostream>
 #include <chrono>
@@ -27,7 +39,7 @@ public:
     int time_count_SOMEIP_start = 0;
     
 
-    void fireDataEvent(const std_msgs::msg::String & gps_data) {
+    void fireDataEvent(const GnssDataMsg & gps_data) {
         
         RCLCPP_INFO(rclcpp::get_logger("STR_SOMEIP_Provider"), "Sending string data over SOME/IP.");
 
@@ -56,9 +68,9 @@ class GnssSomeIpReporter : public rclcpp::Node
 
     static constexpr auto domain = "local";
     static constexpr auto instance = "GnssServer";
-    static constexpr auto timer_duration = 500ms;
+    static constexpr auto timer_duration = 2000ms;
 
-    static constexpr auto topic = "beforeSOMEIP";
+    static constexpr auto topic = "tf";
     static constexpr auto qos = 10;
 
 
@@ -72,12 +84,14 @@ public:
           if(register_someip_service()) {
             RCLCPP_INFO(this->get_logger(), "SOME/IP Server has been registered");
 
-            gpsd_data_subscription = this->create_subscription<GnssDataMsg>(topic, qos, std::bind(&GnssSomeIpReporter::on_gpsd_data, this, std::placeholders::_1));
+            gpsd_data_subscription = this->create_subscription<tf2_msgs::msg::TFMessage>("tf", qos, std::bind(&GnssSomeIpReporter::on_gpsd_data, this, std::placeholders::_1));
+            
 
             
 
             publish_timer = this->create_wall_timer(timer_duration, [this]() {            
-                RCLCPP_INFO(this->get_logger(), "Timer: Broadcast String data over SOME/IP");
+                
+               
         
                 std::lock_guard<std::mutex> guard(mutex);
                 // std::ofstream startFile;
@@ -106,11 +120,18 @@ protected:
         return true;
     }
 
-    void on_gpsd_data(const GnssDataMsg & msg) 
+    void on_gpsd_data(const tf2_msgs::msg::TFMessage & msg) 
     {
 
         std::lock_guard<std::mutex> guard(mutex);
+
         
+        tf2_msgs::msg::TFMessage tf2_msg = msg;
+        geometry_msgs::msg::TransformStamped tf2_data;
+        tf2_data = tf2_msg.transforms[0];
+
+
+    
         // auto end = std::chrono::high_resolution_clock::now();
         // auto end_time = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch().count();
         // std::ofstream endFile;
@@ -118,9 +139,26 @@ protected:
         // endFile << "Run" << std::setw(5) << (time_count_ROS2_end++) << ":" << end_time << std::endl;
         // endFile.close();
 
-        RCLCPP_INFO(this->get_logger(), "Received String data from STR_Client node");
+        RCLCPP_INFO(this->get_logger(), "Received String data from Tf2_Client node");
+        // RCLCPP_INFO(this->get_logger(), "Received transform: [%f, %f, %f]",
+        //                 msg.transforms[0].transform.translation.x,
+        //                 msg.transforms[0].transform.translation.y,
+        //                 msg.transforms[0].transform.translation.z);
+        RCLCPP_INFO(this->get_logger(), "Received transform: [%f, %f, %f]",
+                        tf2_data.transform.translation.x,
+                        tf2_data.transform.translation.y,
+                        tf2_data.transform.translation.z);
+        // RCLCPP_INFO(this->get_logger(), "Received transform: [%f]",
+        //                 tf2_data.transform.translation.x);
 
-        gps_data = msg;
+        gps_data = tf2_data;
+
+        RCLCPP_INFO(this->get_logger(), "assigned data: [%f, %f, %f]",
+                        gps_data.transform.translation.x,
+                        gps_data.transform.translation.y,
+                        gps_data.transform.translation.z);
+       
+        
     }
 
 private:
@@ -129,9 +167,11 @@ private:
 
     std::mutex mutex;
 
-    std_msgs::msg::String gps_data;
+    geometry_msgs::msg::TransformStamped gps_data;
 
-    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr gpsd_data_subscription;
+    rclcpp::Subscription<tf2_msgs::msg::TFMessage>::SharedPtr gpsd_data_subscription;
+
+    
 
     int time_count_ROS2_end = 0;
     int time_count_SOMEIP_start = 0;

@@ -7,7 +7,7 @@ interface GnssServer {
 
     broadcast data {
         out {
-            String str
+            Tf2_transform data
         }
     }
 } 

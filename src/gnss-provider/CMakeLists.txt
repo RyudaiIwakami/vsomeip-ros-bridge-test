@@ -25,6 +25,11 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 
 find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+
+find_package(tf2 REQUIRED)
+find_package(tf2_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
 
 
 
@@ -36,6 +41,10 @@ target_link_libraries(gnss_someip_lib
         CommonAPI-SomeIP
         gnss_someip_lib::gnss-msg__rosidl_generator_cpp    # TODO: figure out how to define exported targets
         gnss_someip_lib::gnss-msg__rosidl_typesupport_cpp    # TODO: figure out how to define exported targets
+        ${geometry_msgs_LIBRARIES}
+        ${tf2_LIBRARIES}
+        ${tf2_msgs_LIBRARIES}
+        ${tf2_ros_LIBRARIES}
 )
 
 set(SERVER_TARGET_NAME gnss-server)
@@ -49,6 +58,10 @@ add_executable(${SERVER_TARGET_NAME}
 target_include_directories(${SERVER_TARGET_NAME} PRIVATE 
     ${COMMONAPI_INCLUDE_DIRS}
     ${std_msgs_INCLUDE_DIRS}
+    ${geometry_msgs_INCLUDE_DIRS}
+    ${tf2_INCLUDE_DIRS}
+    ${tf2_msgs_INCLUDE_DIRS}
+    ${tf2_ros_INCLUDE_DIRS}
     )
 
 
@@ -61,7 +74,6 @@ target_link_libraries(${SERVER_TARGET_NAME} PRIVATE
     gnss_someip_lib
     ${std_msgs_LIBRARIES}
 )
-
 
 
 target_compile_features(${SERVER_TARGET_NAME} PRIVATE cxx_std_17)
