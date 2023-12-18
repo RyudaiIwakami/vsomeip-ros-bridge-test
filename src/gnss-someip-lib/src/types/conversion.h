@@ -57,11 +57,11 @@ GnssData to_capi_type(const GnssDataMsg & gps_data) {
     gps_data_msg.transform.rotation.z = gnss_data.getOrientation().getZ();
     gps_data_msg.transform.rotation.w = gnss_data.getOrientation().getW();
 
-    
-    
-    
+    gps_data_msg.transform.translation.x = gnss_data.getVector().getX();
+    gps_data_msg.transform.translation.y = gnss_data.getVector().getY();
+    gps_data_msg.transform.translation.z = gnss_data.getVector().getZ();
 
-
+    
     return gps_data_msg;
  }
 

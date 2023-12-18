@@ -25,6 +25,11 @@ typeCollection common {
         String str
     }
 
+    struct GnssData {
+        Vector3 position 
+        Time time
+    }
+
     struct Header{
         UInt32 seq
         Double time_stamp

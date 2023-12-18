@@ -13,12 +13,20 @@
 #include <fstream>
 #include <iomanip>
 
+#include <geometry_msgs/msg/transform_stamped.hpp>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_ros/transform_broadcaster.h>
+#include <tf2_ros/buffer.h>
+#include <tf2_msgs/msg/tf_message.hpp>
+
+#include <tf2_ros/static_transform_broadcaster_node.hpp>
+
+
 // #include <iostream>
 
 
-using GpsDataMsg = std_msgs::msg::String;
-using GnssData = v0::gnss::common::Str;
-
+using GpsDataMsg = geometry_msgs::msg::TransformStamped;
+using GnssData = v0::gnss::common::Tf2_transform;
 // std::ofstream endFile;
 
 template<template<typename ...> class P>
@@ -108,20 +116,20 @@ public:
     void onAvailable() override {
 
             
-            proxy()->getDataEvent().subscribe([this](const std::string & data) {
+            proxy()->getDataEvent().subscribe([this](const geometry_msgs::msg::TransformStamped & data) {
 
 
-            auto end = std::chrono::high_resolution_clock::now();
-            auto end_time = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch().count();
+            // auto end = std::chrono::high_resolution_clock::now();
+            // auto end_time = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch().count();
 
             auto message = Types::Conversion::from_capi_type(data);
 
             
             
             
-            std::ofstream endFile;
-            endFile.open("end_times_SOMEIP_1024byte.csv", std::ios::app);
-            endFile << "Run" << std::setw(5) << (time_count_SOMEIP_end++) << ":" << end_time << std::endl;
+            // std::ofstream endFile;
+            // endFile.open("end_times_SOMEIP_1024byte.csv", std::ios::app);
+            // endFile << "Run" << std::setw(5) << (time_count_SOMEIP_end++) << ":" << end_time << std::endl;
             
             message_callback(message);
         });

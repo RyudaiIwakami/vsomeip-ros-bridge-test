@@ -18,6 +18,18 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 
+find_package(geometry_msgs REQUIRED)
+
+find_package(tf2 REQUIRED)
+find_package(tf2_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+
+find_package(rosidl_default_generators REQUIRED)
+
+
+
+
+
 add_library(gnss_someip_lib INTERFACE IMPORTED)
 target_link_libraries(gnss_someip_lib 
     INTERFACE 
@@ -37,6 +49,10 @@ target_compile_definitions(${CLIENT_TARGET_NAME} PRIVATE -DGNSS_CLIENT_VERSION="
 target_include_directories(${CLIENT_TARGET_NAME} PRIVATE 
     ${COMMONAPI_INCLUDE_DIRS}
     ${std_msgs_INCLUDE_DIRS}
+    ${geometry_msgs_INCLUDE_DIRS}
+    ${tf2_INCLUDE_DIRS}
+    ${tf2_msgs_INCLUDE_DIRS}
+    ${tf2_ros_INCLUDE_DIRS}
 )
 
 target_link_libraries(${CLIENT_TARGET_NAME} PRIVATE
@@ -44,6 +60,10 @@ target_link_libraries(${CLIENT_TARGET_NAME} PRIVATE
     rclcpp::rclcpp
     gnss_someip_lib
     ${std_msgs_LIBRARIES}
+    ${geometry_msgs_LIBRARIES}
+    ${tf2_LIBRARIES}
+    ${tf2_msgs_LIBRARIES}
+    ${tf2_ros_LIBRARIES}
 )
 
 install(TARGETS ${CLIENT_TARGET_NAME} DESTINATION lib/${PROJECT_NAME})
