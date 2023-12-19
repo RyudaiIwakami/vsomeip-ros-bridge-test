@@ -26,7 +26,7 @@
 
 
 using GpsDataMsg = geometry_msgs::msg::TransformStamped;
-using GnssData = v0::gnss::common::Tf2_transform;
+using GnssData = v0::gnss::common::TransformStamped;
 // std::ofstream endFile;
 
 template<template<typename ...> class P>
@@ -116,7 +116,7 @@ public:
     void onAvailable() override {
 
             
-            proxy()->getDataEvent().subscribe([this](const geometry_msgs::msg::TransformStamped & data) {
+            proxy()->getDataEvent().subscribe([this](const GnssData & data) {
 
 
             // auto end = std::chrono::high_resolution_clock::now();

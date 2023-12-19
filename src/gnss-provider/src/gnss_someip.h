@@ -41,7 +41,7 @@ public:
 
     void fireDataEvent(const GnssDataMsg & gps_data) {
         
-        RCLCPP_INFO(rclcpp::get_logger("STR_SOMEIP_Provider"), "Sending string data over SOME/IP.");
+        RCLCPP_INFO(rclcpp::get_logger("TF2_SOMEIP_Provider"), "Sending string data over SOME/IP.");
 
         // std::ofstream startFile;
         // startFile.open("start_times_SOMEIP_1024byte.csv", std::ios::app);
@@ -64,7 +64,7 @@ public:
 template <typename T>
 class GnssSomeIpReporter : public rclcpp::Node
 {
-    static constexpr auto node_name = "STR_SOMEIP_Reporter";
+    static constexpr auto node_name = "TF2_SOMEIP_Reporter";
 
     static constexpr auto domain = "local";
     static constexpr auto instance = "GnssServer";
@@ -140,24 +140,40 @@ protected:
         // endFile.close();
 
         RCLCPP_INFO(this->get_logger(), "Received String data from Tf2_Client node");
-        // RCLCPP_INFO(this->get_logger(), "Received transform: [%f, %f, %f]",
-        //                 msg.transforms[0].transform.translation.x,
-        //                 msg.transforms[0].transform.translation.y,
-        //                 msg.transforms[0].transform.translation.z);
-        RCLCPP_INFO(this->get_logger(), "Received transform: [%f, %f, %f]",
-                        tf2_data.transform.translation.x,
-                        tf2_data.transform.translation.y,
-                        tf2_data.transform.translation.z);
-        // RCLCPP_INFO(this->get_logger(), "Received transform: [%f]",
-        //                 tf2_data.transform.translation.x);
 
         gps_data = tf2_data;
 
-        RCLCPP_INFO(this->get_logger(), "assigned data: [%f, %f, %f]",
-                        gps_data.transform.translation.x,
-                        gps_data.transform.translation.y,
-                        gps_data.transform.translation.z);
-       
+        RCLCPP_INFO(this->get_logger(), 
+    "Received transform:\n"
+    "  transforms:\n"
+    "  - header:\n"
+    "      stamp:\n"
+    "        sec: %d\n"
+    "        nanosec: %u\n"
+    "      frame_id: %s\n"
+    "    child_frame_id: %s\n"
+    "    transform:\n"
+    "      translation:\n"
+    "        x: %f\n"
+    "        y: %f\n"
+    "        z: %f\n"
+    "      rotation:\n"
+    "        x: %f\n"
+    "        y: %f\n"
+    "        z: %f\n"
+    "        w: %f",
+    gps_data.header.stamp.sec, 
+    gps_data.header.stamp.nanosec, 
+    gps_data.header.frame_id.c_str(), 
+    gps_data.child_frame_id.c_str(), 
+    gps_data.transform.translation.x, 
+    gps_data.transform.translation.y, 
+    gps_data.transform.translation.z, 
+    gps_data.transform.rotation.x, 
+    gps_data.transform.rotation.y, 
+    gps_data.transform.rotation.z, 
+    gps_data.transform.rotation.w);
+
         
     }
 

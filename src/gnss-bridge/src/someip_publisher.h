@@ -3,7 +3,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 
-#include <gnss_someip_lib/msg/tf2_transform.hpp>    
+// #include <gnss_someip_lib/msg/gnss_data.hpp> 
 
 #include <types/conversion.h>
 
@@ -17,8 +17,8 @@
 #include <geometry_msgs/msg/transform_stamped.hpp>
 
 
-using GpsDataMsg = geometry_msgs::msg::TransformStamped
-using GnssData = v0::gnss::common::Tf2_transform;
+using GpsDataMsg = geometry_msgs::msg::TransformStamped;
+using GnssData = v0::gnss::common::TransformStamped;
 template <typename SomeIpClient> 
 class SomeIpPublisher : public rclcpp::Node
 {

@@ -1,7 +1,7 @@
 #include "abstract_someip_client.h"
 #include "someip_publisher.h"
 
-constexpr auto node_name = "STR_SOMEIP_Bridge";
+constexpr auto node_name = "TF2_SOMEIP_Bridge";
 
 auto main(int argc, char **argv) -> int 
 {

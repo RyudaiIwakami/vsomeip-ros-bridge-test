@@ -7,7 +7,7 @@ interface GnssServer {
 
     broadcast data {
         out {
-            Tf2_transform data
+            TransformStamped data
         }
     }
 } 

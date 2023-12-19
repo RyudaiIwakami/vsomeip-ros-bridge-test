@@ -32,7 +32,7 @@ typeCollection common {
 
     struct Header{
         UInt32 seq
-        Double time_stamp
+        Sec_nanosec time_stamp
         String frame_id
     }
 
@@ -53,5 +53,16 @@ typeCollection common {
     struct Tf2_transform{
         Quaternion orientation
         Vector3 vector
+    }
+
+    struct TransformStamped{
+        Header header
+        String child_frame_id
+        Tf2_transform transform
+    }
+
+    struct Sec_nanosec{
+        Int64 sec
+        UInt32 nanosec
     }
 }
