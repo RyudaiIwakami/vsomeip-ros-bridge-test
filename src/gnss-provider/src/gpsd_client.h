@@ -28,7 +28,7 @@ class GpsdClient : public rclcpp::Node {
     static constexpr auto waiting_time = 1000000;
     static constexpr auto topic = "beforeSOMEIP";
     static constexpr auto qos = 10;
-    static constexpr auto gpsd_read_timer_delay = 2000ms;
+    static constexpr auto gpsd_read_timer_delay = 200ms;
 
     // std::chrono::system_clock::time_point  start;
     // std::time_t time_stamp;

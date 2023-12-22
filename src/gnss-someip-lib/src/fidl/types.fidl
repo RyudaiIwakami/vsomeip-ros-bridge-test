@@ -65,4 +65,24 @@ typeCollection common {
         Int64 sec
         UInt32 nanosec
     }
+
+    struct PointField{
+        UInt8 datatype
+        String name
+        UInt32 offset
+        UInt32 count
+    }
+
+     struct PointCloud2{
+        Header header
+        UInt32 height
+        UInt32 width
+        PointField[] fields
+        Boolean is_bigendian
+        UInt32 point_step
+        UInt32 row_step
+        UInt8[] data
+        Boolean is_dense
+    }
+
 }

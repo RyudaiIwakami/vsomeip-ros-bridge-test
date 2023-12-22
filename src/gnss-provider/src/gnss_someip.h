@@ -68,7 +68,7 @@ class GnssSomeIpReporter : public rclcpp::Node
 
     static constexpr auto domain = "local";
     static constexpr auto instance = "GnssServer";
-    static constexpr auto timer_duration = 2000ms;
+    static constexpr auto timer_duration = 200ms;
 
     static constexpr auto topic = "tf";
     static constexpr auto qos = 10;
@@ -94,14 +94,16 @@ public:
                
         
                 std::lock_guard<std::mutex> guard(mutex);
-                // std::ofstream startFile;
-                // startFile.open("start_times_SOMEIP.csv", std::ios::app);
+                std::ofstream startFile;
+                startFile.open("start_times_SOMEIP.csv", std::ios::app);
+
+                auto start = std::chrono::high_resolution_clock::now();
+                auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
+                startFile << "Run" << std::setw(5) << (time_count_SOMEIP_start++) << ":" << start_time << std::endl;
                 
                 someip_provider->fireDataEvent(gps_data);
                 
-                // auto start = std::chrono::high_resolution_clock::now();
-                // auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
-                // startFile << "Run" << std::setw(5) << (time_count_SOMEIP_start++) << ":" << start_time << std::endl;
+                
             });
          }  
     }

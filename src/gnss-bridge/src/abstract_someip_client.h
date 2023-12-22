@@ -119,17 +119,17 @@ public:
             proxy()->getDataEvent().subscribe([this](const GnssData & data) {
 
 
-            // auto end = std::chrono::high_resolution_clock::now();
-            // auto end_time = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch().count();
+            
 
             auto message = Types::Conversion::from_capi_type(data);
 
+            auto end = std::chrono::high_resolution_clock::now();
+            auto end_time = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch().count();
             
             
-            
-            // std::ofstream endFile;
-            // endFile.open("end_times_SOMEIP_1024byte.csv", std::ios::app);
-            // endFile << "Run" << std::setw(5) << (time_count_SOMEIP_end++) << ":" << end_time << std::endl;
+            std::ofstream endFile;
+            endFile.open("end_times_SOMEIP.csv", std::ios::app);
+            endFile << "Run" << std::setw(5) << (time_count_SOMEIP_end++) << ":" << end_time << std::endl;
             
             message_callback(message);
         });
