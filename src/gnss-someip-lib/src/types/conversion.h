@@ -8,6 +8,8 @@
 // #include "geometry_msgs/msg/pose.hpp"
 #include "sensor_msgs/msg/point_cloud2.hpp"
 
+#include <iostream>
+
 // #include "tf2_ros/static_transform_broadcaster_node.hpp"
 
 using namespace std::chrono;
@@ -28,7 +30,7 @@ GnssData to_capi_type(const GnssDataMsg & gps_data) {
 
     v0::gnss::common::Header header;
     v0::gnss::common::Sec_nanosec time_stamp_2;
-    v0::gnss::common::PointField point_field;
+    v0::gnss::common::PointField point_field[gps_data.fields.size()];
     v0::gnss::common::PointCloud2 point_cloud_2;
     std::vector<v0::gnss::common::PointField> point_fields;
 
@@ -42,21 +44,24 @@ GnssData to_capi_type(const GnssDataMsg & gps_data) {
 
     
     if (!gps_data.fields.empty()) {
-        point_field.setName(gps_data.fields[0].name);
-        point_field.setOffset(gps_data.fields[0].offset);
-        point_field.setDatatype(gps_data.fields[0].datatype);
-        point_field.setCount(gps_data.fields[0].count);
+        for (size_t i = 0; i < gps_data.fields.size(); ++i) {
+            point_field[i].setName(gps_data.fields[i].name);
+            point_field[i].setOffset(gps_data.fields[i].offset);
+            point_field[i].setDatatype(gps_data.fields[i].datatype);
+            point_field[i].setCount(gps_data.fields[i].count);
+            point_fields.push_back(point_field[i]);
+            gnss_data.setFields(point_fields);
 
-        point_fields.push_back(point_field); 
-        gnss_data.setFields(point_fields);
+        }
+        // point_field[i].setName(gps_data.fields[i].name);
+        // // point_field.setOffset(gps_data.fields[0].offset);
+        // // point_field.setDatatype(gps_data.fields[0].datatype);
+        // // point_field.setCount(gps_data.fields[0].count);
+
+        
+        
     }
-
-    // point_field.setName(gps_data.fields[0].name);
-    // point_field.setOffset(gps_data.fields[0].offset);
-    // point_field.setDatatype(gps_data.fields[0].datatype);
-    // point_field.setCount(gps_data.fields[0].count);
-
-    // point_fields.push_back(point_field); 
+ 
 
     gnss_data.setHeader(header);
     gnss_data.setHeight(gps_data.height);
@@ -78,48 +83,48 @@ GnssData to_capi_type(const GnssDataMsg & gps_data) {
  * @param gps_data 
  * @return GnssData 
  */
-//  GnssDataMsg from_capi_type(const GnssData & gnss_data) {
+ GnssDataMsg from_capi_type(const GnssData & PC2_data) {
 
-//     GnssDataMsg gps_data_msg;
+    GnssDataMsg PC2_data_msg;
 
-//     gps_data_msg.header.stamp.sec = gnss_data.getHeader().getTime_stamp().getSec();
-//     gps_data_msg.header.stamp.nanosec = gnss_data.getHeader().getTime_stamp().getNanosec();
-//     gps_data_msg.header.frame_id = gnss_data.getHeader().getFrame_id();
+    PC2_data_msg.header.stamp.sec = PC2_data.getHeader().getTime_stamp().getSec();
+    PC2_data_msg.header.stamp.nanosec = PC2_data.getHeader().getTime_stamp().getNanosec();
+    PC2_data_msg.header.frame_id = PC2_data.getHeader().getFrame_id();
 
-//     gps_data_msg.child_frame_id = gnss_data.getChild_frame_id();
+    if(!PC2_data.getFields().size() > 0) {
+        // PC2_data_msg.fields.resize(PC2_data.getFields().size());
 
-//     gps_data_msg.transform.rotation.x = gnss_data.getTransform().getOrientation().getX();
-//     gps_data_msg.transform.rotation.y = gnss_data.getTransform().getOrientation().getY();
-//     gps_data_msg.transform.rotation.z = gnss_data.getTransform().getOrientation().getZ();
-//     gps_data_msg.transform.rotation.w = gnss_data.getTransform().getOrientation().getW();
+        for (size_t i = 0; i < PC2_data.getFields().size(); ++i) {
+    PC2_data_msg.fields[i].name = PC2_data.getFields()[i].getName();
+    PC2_data_msg.fields[i].offset = PC2_data.getFields()[i].getOffset();
+    PC2_data_msg.fields[i].datatype = PC2_data.getFields()[i].getDatatype();
+    PC2_data_msg.fields[i].count = PC2_data.getFields()[i].getCount() // PC2_data_msg.fields.resize(PC2_data.getFields().size());;
+    // std::cout << "PC2_data_msg.fields[i].name: " << PC2_data_msg.fields[i].name << std::endl;
+}
+    }
 
-//     gps_data_msg.transform.translation.x = gnss_data.getTransform().getVector().getX();
-//     gps_data_msg.transform.translation.y = gnss_data.getTransform().getVector().getY();
-//     gps_data_msg.transform.translation.z = gnss_data.getTransform().getVector().getZ();
+        
 
-    
+    // PC2_data_msg.fields[0].name = PC2_data.getFields()[0].getName();
+    // PC2_data_msg.fields[0].offset = PC2_data.getFields()[0].getOffset();
+    // PC2_data_msg.fields[0].datatype = PC2_data.getFields()[0].getDatatype();
+    // PC2_data_msg.fields[0].count = PC2_data.getFields()[0].getCount();
 
-//     // gps_data_msg.header.stamp = gnss_data.getHeader().getTime_stamp();
-//     // gps_data_msg.header.frame_id = gnss_data.getHeader().getFrame_id();
-//     // gps_data_msg.child_frame_id = gnss_data.getChild_frame_id();
-
-
-//     // gps_data_msg.transform.rotation.x = gnss_data.getTransform().getOrientation().getX();
-//     // gps_data_msg.transform.rotation.y = gnss_data.getTransform().getOrientation().getY();
-//     // gps_data_msg.transform.rotation.z = gnss_data.getTransform().getOrientation().getZ();
-//     // gps_data_msg.transform.rotation.w = gnss_data.getTransform().getOrientation().getW();
-
-//     // gps_data_msg.transform.translation.x = gnss_data.getTransform().getVector().getX();
-//     // gps_data_msg.transform.translation.y = gnss_data.getTransform().getVector().getY();
-//     // gps_data_msg.transform.translation.z = gnss_data.getTransform().getVector().getZ();
-
-  
-
+    PC2_data_msg.height = PC2_data.getHeight();
+    PC2_data_msg.width = PC2_data.getWidth();
+    PC2_data_msg.is_bigendian = PC2_data.getIs_bigendian();
+    PC2_data_msg.point_step = PC2_data.getPoint_step();
+    PC2_data_msg.row_step = PC2_data.getRow_step();
+    PC2_data_msg.data = PC2_data.getData();
+    PC2_data_msg.is_dense = PC2_data.getIs_dense();
 
     
-    
-//     return gps_data_msg;
-//  }
+
+    return PC2_data_msg;
+
+
+
+ }
 
 
 } // namespace TypeConversion

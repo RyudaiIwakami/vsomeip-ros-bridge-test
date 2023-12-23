@@ -18,14 +18,15 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 
-find_package(geometry_msgs REQUIRED)
-
-find_package(tf2 REQUIRED)
-find_package(tf2_msgs REQUIRED)
-find_package(tf2_ros REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(PCL REQUIRED COMPONENTS common io)
+find_package(pcl_conversions REQUIRED) 
+find_package(pcl_msgs REQUIRED)
 
 find_package(rosidl_default_generators REQUIRED)
 
+
+find_package(message_filters REQUIRED)
 
 
 
@@ -37,6 +38,13 @@ target_link_libraries(gnss_someip_lib
         CommonAPI-SomeIP
         gnss_someip_lib::gnss-msg__rosidl_generator_cpp    # TODO: figure out how to define exported targets
         gnss_someip_lib::gnss-msg__rosidl_typesupport_cpp    # TODO: figure out how to define exported targets
+        ${PCL_LIBRARIES}
+        ${sensor_msgs_LIBRARIES}
+        ${message_filters_LIBRARIES}
+        ${PCL_COMMON_LIBRARIES}
+        ${PCL_IO_LIBRARIES}
+        ${PCL_MSGS_LIBRARIES}
+        ${pcl_conversions_LIBRARIES}
 )
 
 set(CLIENT_TARGET_NAME gnss-bridge)
@@ -49,10 +57,13 @@ target_compile_definitions(${CLIENT_TARGET_NAME} PRIVATE -DGNSS_CLIENT_VERSION="
 target_include_directories(${CLIENT_TARGET_NAME} PRIVATE 
     ${COMMONAPI_INCLUDE_DIRS}
     ${std_msgs_INCLUDE_DIRS}
-    ${geometry_msgs_INCLUDE_DIRS}
-    ${tf2_INCLUDE_DIRS}
-    ${tf2_msgs_INCLUDE_DIRS}
-    ${tf2_ros_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
+    ${sensor_msgs_INCLUDE_DIRS}
+    ${message_filters_INCLUDE_DIRS}
+    ${PCL_COMMON_INCLUDE_DIRS}
+    ${PCL_IO_INCLUDE_DIRS}
+    ${PCL_MSGS_INCLUDE_DIRS}
+    ${pcl_conversions_INCLUDE_DIRS}
 )
 
 target_link_libraries(${CLIENT_TARGET_NAME} PRIVATE
@@ -60,10 +71,6 @@ target_link_libraries(${CLIENT_TARGET_NAME} PRIVATE
     rclcpp::rclcpp
     gnss_someip_lib
     ${std_msgs_LIBRARIES}
-    ${geometry_msgs_LIBRARIES}
-    ${tf2_LIBRARIES}
-    ${tf2_msgs_LIBRARIES}
-    ${tf2_ros_LIBRARIES}
 )
 
 install(TARGETS ${CLIENT_TARGET_NAME} DESTINATION lib/${PROJECT_NAME})

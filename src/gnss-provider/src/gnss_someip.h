@@ -52,6 +52,15 @@ public:
 
         auto data = Types::Conversion::to_capi_type(PC2_data);
 
+            std::stringstream ss;
+    for (const auto& field : data.getFields()) {
+    ss << "Name: " << field.getName() << ", "
+       << "Offset: " << field.getOffset() << ", "
+       << "Datatype: " << static_cast<int>(field.getDatatype()) << ", "
+       << "Count: " << field.getCount() << std::endl;
+}
+    RCLCPP_INFO(rclcpp::get_logger("logger_name"), "PointCloud2 Fields after convert PR:\n%s", ss.str().c_str());
+
         GnssServerStub::fireDataEvent(data);
 
         // auto start = std::chrono::high_resolution_clock::now();
@@ -156,7 +165,7 @@ protected:
 
         // gps_data = PC2_data;
 
-        RCLCPP_INFO(rclcpp::get_logger("PointCloud2Logger"), 
+        RCLCPP_INFO(rclcpp::get_logger("PointCloud2Logger_SOMEIP_Reporter"), 
         "PointCloud2 Info:\n"
         " - Height: %u\n"
         " - Width: %u\n"
@@ -171,6 +180,15 @@ protected:
         PC2_data.is_dense ? "True" : "False",
         PC2_data.data.size()
         );
+
+        std::stringstream ss;
+    for (const auto& field : PC2_data.fields) {
+    ss << "Name: " << field.name << ", "
+       << "Offset: " << field.offset << ", "
+       << "Datatype: " << static_cast<int>(field.datatype) << ", "
+       << "Count: " << field.count << std::endl;
+}
+    RCLCPP_INFO(rclcpp::get_logger("logger_name"), "PointCloud2 Fields:\n%s", ss.str().c_str());
 
         
         

@@ -13,20 +13,17 @@
 #include <fstream>
 #include <iomanip>
 
-#include <geometry_msgs/msg/transform_stamped.hpp>
-#include <tf2_ros/transform_listener.h>
-#include <tf2_ros/transform_broadcaster.h>
-#include <tf2_ros/buffer.h>
-#include <tf2_msgs/msg/tf_message.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
 
-#include <tf2_ros/static_transform_broadcaster_node.hpp>
+#include <rclcpp/rclcpp.hpp>
+
 
 
 // #include <iostream>
 
 
-using GpsDataMsg = geometry_msgs::msg::TransformStamped;
-using GnssData = v0::gnss::common::TransformStamped;
+using GpsDataMsg = sensor_msgs::msg::PointCloud2;
+using GnssData = v0::gnss::common::PointCloud2;
 // std::ofstream endFile;
 
 template<template<typename ...> class P>
@@ -118,18 +115,35 @@ public:
             
             proxy()->getDataEvent().subscribe([this](const GnssData & data) {
 
-
+                    std::stringstream ss;
+                    for (const auto& field : data.getFields()) {
+                    ss << "Name: " << field.getName() << ", "
+                    << "Offset: " << field.getOffset() << ", "
+                    << "Datatype: " << static_cast<int>(field.getDatatype()) << ", "
+                    << "Count: " << field.getCount() << std::endl;
+                }
+                    RCLCPP_INFO(rclcpp::get_logger("logger_name"), "PointCloud2 Fields before convert:\n%s", ss.str().c_str());
             
 
             auto message = Types::Conversion::from_capi_type(data);
 
-            auto end = std::chrono::high_resolution_clock::now();
-            auto end_time = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch().count();
+            std::stringstream tt;
+                    for (const auto& field : message.fields) {
+                    tt << "Name: " << field.name<< ", " 
+                    << "Offset: " << field.offset << ", "
+                    << "Datatype: " << static_cast<int>(field.datatype) << ", "
+                    << "Count: " << field.count << std::endl;
+
+                }
+                    RCLCPP_INFO(rclcpp::get_logger("logger_name"), "PointCloud2 Fields after convert BR:\n%s", tt.str().c_str());
+
+            // auto end = std::chrono::high_resolution_clock::now();
+            // auto end_time = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch().count();
             
             
-            std::ofstream endFile;
-            endFile.open("end_times_SOMEIP.csv", std::ios::app);
-            endFile << "Run" << std::setw(5) << (time_count_SOMEIP_end++) << ":" << end_time << std::endl;
+            // std::ofstream endFile;
+            // endFile.open("end_times_SOMEIP.csv", std::ios::app);
+            // endFile << "Run" << std::setw(5) << (time_count_SOMEIP_end++) << ":" << end_time << std::endl;
             
             message_callback(message);
         });
