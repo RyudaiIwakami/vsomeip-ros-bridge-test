@@ -7,7 +7,7 @@ interface GnssServer {
 
     broadcast data {
         out {
-            TransformStamped data
+            PointCloud2 data
         }
     }
 } 

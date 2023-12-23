@@ -10,16 +10,18 @@
 
 #include <types/conversion.h>
 
-#include "geometry_msgs/msg/pose.hpp"
+// #include "geometry_msgs/msg/pose.hpp"
 
-#include <tf2_ros/transform_listener.h>
-#include <geometry_msgs/msg/transform_stamped.hpp>
+// #include <tf2_ros/transform_listener.h>
+// #include <geometry_msgs/msg/transform_stamped.hpp>
 
-#include "tf2_ros/static_transform_broadcaster_node.hpp"
+// #include "tf2_ros/static_transform_broadcaster_node.hpp"
 
-#include "tf2_ros/transform_broadcaster.h"
-#include <tf2_ros/buffer.h>
-#include <tf2_msgs/msg/tf_message.hpp>
+// #include "tf2_ros/transform_broadcaster.h"
+// #include <tf2_ros/buffer.h>
+// #include <tf2_msgs/msg/tf_message.hpp>
+
+#include <sensor_msgs/msg/point_cloud2.hpp>
 
 
 
@@ -39,16 +41,16 @@ public:
     int time_count_SOMEIP_start = 0;
     
 
-    void fireDataEvent(const GnssDataMsg & gps_data) {
+    void fireDataEvent(const GnssDataMsg & PC2_data) {
         
-        RCLCPP_INFO(rclcpp::get_logger("TF2_SOMEIP_Provider"), "Sending string data over SOME/IP.");
+        RCLCPP_INFO(rclcpp::get_logger("PC2_SOMEIP_Provider"), "Sending PointCloud data over SOME/IP.");
 
         // std::ofstream startFile;
-        // startFile.open("start_times_SOMEIP_1024byte.csv", std::ios::app);
+        // startFile.open("start_times_Ssomeip_provider->fireDataEvent(PC2_data);OMEIP_1024byte.csv", std::ios::app);
 
         
 
-        auto data = Types::Conversion::to_capi_type(gps_data);
+        auto data = Types::Conversion::to_capi_type(PC2_data);
 
         GnssServerStub::fireDataEvent(data);
 
@@ -64,13 +66,13 @@ public:
 template <typename T>
 class GnssSomeIpReporter : public rclcpp::Node
 {
-    static constexpr auto node_name = "TF2_SOMEIP_Reporter";
+    static constexpr auto node_name = "PC2_SOMEIP_Reporter";
 
     static constexpr auto domain = "local";
     static constexpr auto instance = "GnssServer";
-    static constexpr auto timer_duration = 200ms;
+    static constexpr auto timer_duration = 2000ms;
 
-    static constexpr auto topic = "tf";
+    static constexpr auto topic = "beforeSOMEIP";
     static constexpr auto qos = 10;
 
 
@@ -79,12 +81,11 @@ public:
         : Node(node_name)
         , someip_provider(std::make_shared<T>())
     {
-            
-         
+  
           if(register_someip_service()) {
             RCLCPP_INFO(this->get_logger(), "SOME/IP Server has been registered");
 
-            gpsd_data_subscription = this->create_subscription<tf2_msgs::msg::TFMessage>("tf", qos, std::bind(&GnssSomeIpReporter::on_gpsd_data, this, std::placeholders::_1));
+            gpsd_data_subscription = this->create_subscription<sensor_msgs::msg::PointCloud2>(topic, qos, std::bind(&GnssSomeIpReporter::on_gpsd_data, this, std::placeholders::_1));
             
 
             
@@ -93,15 +94,16 @@ public:
                 
                
         
-                std::lock_guard<std::mutex> guard(mutex);
-                std::ofstream startFile;
-                startFile.open("start_times_SOMEIP.csv", std::ios::app);
+                // std::lock_guard<std::mutex> guard(mutex);
+                // std::ofstream startFile;
+                // startFile.open("start_times_SOMEIP.csv", std::ios::app);
 
-                auto start = std::chrono::high_resolution_clock::now();
-                auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
-                startFile << "Run" << std::setw(5) << (time_count_SOMEIP_start++) << ":" << start_time << std::endl;
+                // auto start = std::chrono::high_resolution_clock::now();
+                // auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
+                // startFile << "Run" << std::setw(5) << (time_count_SOMEIP_start++) << ":" << start_time << std::endl;
+                std::lock_guard<std::mutex> guard(mutex);
                 
-                someip_provider->fireDataEvent(gps_data);
+                someip_provider->fireDataEvent(PC2_data);
                 
                 
             });
@@ -122,15 +124,24 @@ protected:
         return true;
     }
 
-    void on_gpsd_data(const tf2_msgs::msg::TFMessage & msg) 
+    void on_gpsd_data(const sensor_msgs::msg::PointCloud2 & msg) 
     {
 
         std::lock_guard<std::mutex> guard(mutex);
 
         
-        tf2_msgs::msg::TFMessage tf2_msg = msg;
-        geometry_msgs::msg::TransformStamped tf2_data;
-        tf2_data = tf2_msg.transforms[0];
+        // sensor_msgs::msg::PointCloud2 PC2_data = msg;
+        // sensor_msgs::msg::PointCloud2 PC2_data;
+        PC2_data.header = msg.header;
+        PC2_data.height = msg.height;
+        PC2_data.width = msg.width;
+        PC2_data.fields = msg.fields;
+        PC2_data.is_bigendian = msg.is_bigendian;
+        PC2_data.point_step = msg.point_step;
+        PC2_data.row_step = msg.row_step;
+        PC2_data.data = msg.data;
+        PC2_data.is_dense = msg.is_dense;
+
 
 
     
@@ -141,41 +152,27 @@ protected:
         // endFile << "Run" << std::setw(5) << (time_count_ROS2_end++) << ":" << end_time << std::endl;
         // endFile.close();
 
-        RCLCPP_INFO(this->get_logger(), "Received String data from Tf2_Client node");
+        RCLCPP_INFO(this->get_logger(), "Received PointCloud2 data from PC2_Client node");
 
-        gps_data = tf2_data;
+        // gps_data = PC2_data;
 
-        RCLCPP_INFO(this->get_logger(), 
-    "Received transform:\n"
-    "  transforms:\n"
-    "  - header:\n"
-    "      stamp:\n"
-    "        sec: %d\n"
-    "        nanosec: %u\n"
-    "      frame_id: %s\n"
-    "    child_frame_id: %s\n"
-    "    transform:\n"
-    "      translation:\n"
-    "        x: %f\n"
-    "        y: %f\n"
-    "        z: %f\n"
-    "      rotation:\n"
-    "        x: %f\n"
-    "        y: %f\n"
-    "        z: %f\n"
-    "        w: %f",
-    gps_data.header.stamp.sec, 
-    gps_data.header.stamp.nanosec, 
-    gps_data.header.frame_id.c_str(), 
-    gps_data.child_frame_id.c_str(), 
-    gps_data.transform.translation.x, 
-    gps_data.transform.translation.y, 
-    gps_data.transform.translation.z, 
-    gps_data.transform.rotation.x, 
-    gps_data.transform.rotation.y, 
-    gps_data.transform.rotation.z, 
-    gps_data.transform.rotation.w);
+        RCLCPP_INFO(rclcpp::get_logger("PointCloud2Logger"), 
+        "PointCloud2 Info:\n"
+        " - Height: %u\n"
+        " - Width: %u\n"
+        " - Point Step: %u\n"
+        " - Row Step: %u\n"
+        " - Is Dense: %s\n"
+        " - Data Size: %lu",
+        PC2_data.height,
+        PC2_data.width,
+        PC2_data.point_step,
+        PC2_data.row_step,
+        PC2_data.is_dense ? "True" : "False",
+        PC2_data.data.size()
+        );
 
+        
         
     }
 
@@ -185,9 +182,13 @@ private:
 
     std::mutex mutex;
 
-    geometry_msgs::msg::TransformStamped gps_data;
 
-    rclcpp::Subscription<tf2_msgs::msg::TFMessage>::SharedPtr gpsd_data_subscription;
+    sensor_msgs::msg::PointCloud2 PC2_data;
+
+ 
+
+
+    rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr gpsd_data_subscription;
 
     
 

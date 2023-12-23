@@ -30,11 +30,7 @@ typeCollection common {
         Time time
     }
 
-    struct Header{
-        UInt32 seq
-        Sec_nanosec time_stamp
-        String frame_id
-    }
+   
 
 
     struct Vector3{
@@ -64,6 +60,12 @@ typeCollection common {
     struct Sec_nanosec{
         Int64 sec
         UInt32 nanosec
+    }
+
+     struct Header{
+        UInt32 seq
+        Sec_nanosec time_stamp
+        String frame_id
     }
 
     struct PointField{

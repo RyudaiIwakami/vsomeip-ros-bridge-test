@@ -8,9 +8,10 @@ auto main(int argc, char **argv) -> int
     rclcpp::init(argc, argv);
 
     rclcpp::executors::MultiThreadedExecutor executor;
+    int data_size = 1024;
 
     auto gnss_someip_reporter_node = std::make_shared<GnssSomeIpReporter<GnssSomeIpProvider>>();
-    auto gpsd_client_node = std::make_shared<GpsdClient>();
+    auto gpsd_client_node = std::make_shared<GpsdClient>(data_size);
 
     executor.add_node(gnss_someip_reporter_node);
     executor.add_node(gpsd_client_node);

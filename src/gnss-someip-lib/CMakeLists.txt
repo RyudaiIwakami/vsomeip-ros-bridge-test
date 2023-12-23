@@ -22,6 +22,9 @@ find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
+find_package(PCL REQUIRED COMPONENTS common io)
+find_package(pcl_conversions REQUIRED) 
+
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
@@ -110,6 +113,7 @@ target_include_directories(${GNSS_TARGET_NAME}
         ${sensor_msgs_INCLUDE_DIRS}
         ${std_msgs_INCLUDE_DIRS}
         ${geometry_msgs_INCLUDE_DIRS}
+        ${PCL_INCLUDE_DIRS}
         
     PUBLIC 
         $<INSTALL_INTERFACE:${GNSS_INSTALL_INCLUDEDIR}>
