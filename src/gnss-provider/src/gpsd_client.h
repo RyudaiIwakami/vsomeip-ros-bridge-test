@@ -28,24 +28,27 @@
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
 
+#define DATA_SIZE 512 //ファイル名用
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
 
 
 
 class GpsdClient : public rclcpp::Node {
-    static constexpr auto node_name = "TF2_Client_node";
+    static constexpr auto node_name = "PC2_Client_node";
     static constexpr auto waiting_time = 1000000;
     static constexpr auto topic = "beforeSOMEIP";
     static constexpr auto qos = 10;
-    static constexpr auto gpsd_read_timer_delay = 2000ms;
+    static constexpr auto gpsd_read_timer_delay = 100ms;
 
-    // std::chrono::system_clock::time_point  start;
+    std::chrono::system_clock::time_point  start;
     // std::time_t time_stamp;
 
 public:
 
 
    
-
+    std::ofstream startFile;
     
 
     GpsdClient(int num_points) : Node(node_name)
@@ -79,18 +82,24 @@ public:
         // // 位置と回転に使用するための乱数分布を定義（ここでは例として-10.0から10.0まで）
         // std::uniform_real_distribution<> dis(-10.0, 10.0);
 
+        
+
         sensor_msgs::msg::PointCloud2 msg;
         pcl::toROSMsg(*cloud_, msg);
         msg.header.frame_id = "map";
         msg.header.stamp = this->get_clock()->now();
 
+        auto start = std::chrono::high_resolution_clock::now();
+        auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
+
         pcd_publisher_->publish(msg);
 
-
-        //   publisher->publish(message);
-        //   auto start = std::chrono::high_resolution_clock::now();
-        //   auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
-        //   startFile << "Run" << std::setw(5) << (time_count_ROS2_start++) << ":" << start_time << std::endl;
+        
+        startFile.open("PointCloud2_evaluation/evaluation_" TOSTRING(DATA_SIZE) "/01_start_times_ROS2_" TOSTRING(DATA_SIZE) ".csv", std::ios::app);
+        startFile << "Run " << std::setw(6) << (time_count_ROS2_start++) << ":" << start_time << std::endl;
+        startFile.close();
+        //タイムスタンプをファイルに書き込む
+        RCLCPP_INFO(this->get_logger(), "%d\n",count++);
     }
 
 private:
@@ -114,6 +123,8 @@ private:
     rclcpp::Publisher<GnssDataMsg>::SharedPtr publisher;
     size_t count_;
     int time_count_ROS2_start = 0;
+    int time_count_all_start = 0;
+    int count = 0;
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pcd_publisher_;
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_ = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();

@@ -4,10 +4,16 @@
 
 #include "std_msgs/msg/string.hpp"
 
-
+#include <iostream>
+#include <chrono>
+#include <fstream>
+#include <iomanip>
 
 #include <sensor_msgs/msg/point_cloud2.hpp>
 
+#define DATA_SIZE 512 //ファイル名用
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
 
 
 
@@ -26,16 +32,17 @@ public:
     }
 
 private:
-    // void gnss_topic_callback(const GpsDataMsg & msg) const
-    // {
-    //   RCLCPP_INFO(this->get_logger(), "GNSS position latitude %f, longitude %f", 
-    //       msg.position.fix.latitude,
-    //       msg.position.fix.longitude
-    //     );
-    // }
 
      void topic_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg) const
   {
+
+
+    std::ofstream endFile;
+    endFile.open("PointCloud2_evaluation/evaluation_" TOSTRING(DATA_SIZE) "/08_end_time_all_" TOSTRING(DATA_SIZE) ".csv", std::ios::app);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto end_time = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch().count();
+    endFile << "Run" << std::setw(6) << (time_count_all_end++) << ":" << end_time << std::endl;
+
      RCLCPP_INFO(rclcpp::get_logger("PointCloud2Logger_topic"), 
         "PointCloud2 Info:\n"
         " - Height: %u\n"
@@ -67,6 +74,8 @@ private:
   // rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr subscription_;
 
     rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr subscription;
+
+    mutable int time_count_all_end = 0;
 };
 
 auto main(int argc, char * argv[]) -> int

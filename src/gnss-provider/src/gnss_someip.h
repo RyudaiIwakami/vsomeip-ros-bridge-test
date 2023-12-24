@@ -30,6 +30,9 @@
 #include <fstream>
 #include <iomanip>
 
+#define DATA_SIZE 512 //ファイル名用
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
 
 
 class GnssSomeIpProvider : public v0::gnss::GnssServerStubDefault {
@@ -39,29 +42,54 @@ public:
     ~GnssSomeIpProvider() = default;
 
     int time_count_SOMEIP_start = 0;
+    int time_count_before_conversion = 0;
+    int time_count_after_conversion = 0;
     
 
     void fireDataEvent(const GnssDataMsg & PC2_data) {
         
         RCLCPP_INFO(rclcpp::get_logger("PC2_SOMEIP_Provider"), "Sending PointCloud data over SOME/IP.");
 
-        // std::ofstream startFile;
-        // startFile.open("start_times_Ssomeip_provider->fireDataEvent(PC2_data);OMEIP_1024byte.csv", std::ios::app);
+        std::ofstream startFile;    
+        std::ofstream before_conversionFile;
+        std::ofstream after_conversionFile;
+        before_conversionFile.open("PointCloud2_evaluation/evaluation_" TOSTRING(DATA_SIZE) "/03_before_conversion_times_SOMEIP_" TOSTRING(DATA_SIZE) ".csv", std::ios::app);
+        after_conversionFile.open("PointCloud2_evaluation/evaluation_" TOSTRING(DATA_SIZE) "/04_after_conversion_times_SOMEIP_" TOSTRING(DATA_SIZE) ".csv", std::ios::app);
+        startFile.open("PointCloud2_evaluation/evaluation_" TOSTRING(DATA_SIZE) "/05_start_times_SOMEIP_" TOSTRING(DATA_SIZE) ".csv", std::ios::app);
+        
+        auto before_conversion = std::chrono::high_resolution_clock::now();
+        auto before_conversion_time = std::chrono::time_point_cast<std::chrono::microseconds>(before_conversion).time_since_epoch().count();
+        
+        before_conversionFile << "Run" << std::setw(6) << (time_count_before_conversion++) << ":" << before_conversion_time << std::endl;
 
         
 
-        auto data = Types::Conversion::to_capi_type(PC2_data);
+        auto data = Types::Conversion::to_capi_type(PC2_data);//convert to capi type
 
-            std::stringstream ss;
-    for (const auto& field : data.getFields()) {
-    ss << "Name: " << field.getName() << ", "
-       << "Offset: " << field.getOffset() << ", "
-       << "Datatype: " << static_cast<int>(field.getDatatype()) << ", "
-       << "Count: " << field.getCount() << std::endl;
-}
-    RCLCPP_INFO(rclcpp::get_logger("logger_name"), "PointCloud2 Fields after convert PR:\n%s", ss.str().c_str());
+        auto after_conversion = std::chrono::high_resolution_clock::now();
+        auto after_conversion_time = std::chrono::time_point_cast<std::chrono::microseconds>(after_conversion).time_since_epoch().count();
+        
+        after_conversionFile << "Run" << std::setw(6) << (time_count_after_conversion++) << ":" << after_conversion_time << std::endl;
 
-        GnssServerStub::fireDataEvent(data);
+        // std::stringstream ss;
+        // for (const auto& field : data.getFields()) {
+        // ss << "Name: " << field.getName() << ", "
+        // << "Offset: " << field.getOffset() << ", "
+        // << "Datatype: " << static_cast<int>(field.getDatatype()) << ", "
+        // << "Count: " << field.getCount() << std::endl;
+        // }
+
+        // RCLCPP_INFO(rclcpp::get_logger("logger_name"), "PointCloud2 Fields after convert PR:\n%s", ss.str().c_str());
+
+        
+        
+
+        auto start = std::chrono::high_resolution_clock::now();
+        auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
+
+        GnssServerStub::fireDataEvent(data);//send data
+
+        startFile << "Run" << std::setw(6) << (time_count_SOMEIP_start++) << ":" << start_time << std::endl;
 
         // auto start = std::chrono::high_resolution_clock::now();
         // auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
@@ -79,7 +107,7 @@ class GnssSomeIpReporter : public rclcpp::Node
 
     static constexpr auto domain = "local";
     static constexpr auto instance = "GnssServer";
-    static constexpr auto timer_duration = 2000ms;
+    static constexpr auto timer_duration = 100ms;
 
     static constexpr auto topic = "beforeSOMEIP";
     static constexpr auto qos = 10;
@@ -96,25 +124,12 @@ public:
 
             gpsd_data_subscription = this->create_subscription<sensor_msgs::msg::PointCloud2>(topic, qos, std::bind(&GnssSomeIpReporter::on_gpsd_data, this, std::placeholders::_1));
             
-
-            
-
             publish_timer = this->create_wall_timer(timer_duration, [this]() {            
-                
-               
-        
-                // std::lock_guard<std::mutex> guard(mutex);
-                // std::ofstream startFile;
-                // startFile.open("start_times_SOMEIP.csv", std::ios::app);
-
-                // auto start = std::chrono::high_resolution_clock::now();
-                // auto start_time = std::chrono::time_point_cast<std::chrono::microseconds>(start).time_since_epoch().count();
-                // startFile << "Run" << std::setw(5) << (time_count_SOMEIP_start++) << ":" << start_time << std::endl;
+                            
                 std::lock_guard<std::mutex> guard(mutex);
                 
                 someip_provider->fireDataEvent(PC2_data);
-                
-                
+
             });
          }  
     }
@@ -138,9 +153,7 @@ protected:
 
         std::lock_guard<std::mutex> guard(mutex);
 
-        
-        // sensor_msgs::msg::PointCloud2 PC2_data = msg;
-        // sensor_msgs::msg::PointCloud2 PC2_data;
+
         PC2_data.header = msg.header;
         PC2_data.height = msg.height;
         PC2_data.width = msg.width;
@@ -150,20 +163,18 @@ protected:
         PC2_data.row_step = msg.row_step;
         PC2_data.data = msg.data;
         PC2_data.is_dense = msg.is_dense;
+        //データの受け渡し
 
 
 
     
-        // auto end = std::chrono::high_resolution_clock::now();
-        // auto end_time = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch().count();
-        // std::ofstream endFile;
-        // endFile.open("end_times_ROS2_1024byte.csv", std::ios::app);
-        // endFile << "Run" << std::setw(5) << (time_count_ROS2_end++) << ":" << end_time << std::endl;
-        // endFile.close();
+        auto end = std::chrono::high_resolution_clock::now();
+        auto end_time = std::chrono::time_point_cast<std::chrono::microseconds>(end).time_since_epoch().count();
+        std::ofstream endFile;
+        endFile.open("PointCloud2_evaluation/evaluation_" TOSTRING(DATA_SIZE) "/02_end_times_ROS2_" TOSTRING(DATA_SIZE) ".csv", std::ios::app);
+        endFile << "Run" << std::setw(6) << (time_count_ROS2_end++) << ":" << end_time << std::endl;
 
         RCLCPP_INFO(this->get_logger(), "Received PointCloud2 data from PC2_Client node");
-
-        // gps_data = PC2_data;
 
         RCLCPP_INFO(rclcpp::get_logger("PointCloud2Logger_SOMEIP_Reporter"), 
         "PointCloud2 Info:\n"
@@ -179,7 +190,7 @@ protected:
         PC2_data.row_step,
         PC2_data.is_dense ? "True" : "False",
         PC2_data.data.size()
-        );
+        );//データの中身を表示
 
         std::stringstream ss;
     for (const auto& field : PC2_data.fields) {
@@ -200,19 +211,12 @@ private:
 
     std::mutex mutex;
 
-
     sensor_msgs::msg::PointCloud2 PC2_data;
-
- 
-
 
     rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr gpsd_data_subscription;
 
-    
-
     int time_count_ROS2_end = 0;
-    int time_count_SOMEIP_start = 0;
+   
 
-    
-    
+
 };

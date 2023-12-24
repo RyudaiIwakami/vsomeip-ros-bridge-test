@@ -91,14 +91,15 @@ GnssData to_capi_type(const GnssDataMsg & gps_data) {
     PC2_data_msg.header.stamp.nanosec = PC2_data.getHeader().getTime_stamp().getNanosec();
     PC2_data_msg.header.frame_id = PC2_data.getHeader().getFrame_id();
 
-    if(!PC2_data.getFields().size() > 0) {
-        // PC2_data_msg.fields.resize(PC2_data.getFields().size());
+    if(PC2_data.getFields().size() > 0) {
+        PC2_data_msg.fields.resize(PC2_data.getFields().size());
 
         for (size_t i = 0; i < PC2_data.getFields().size(); ++i) {
     PC2_data_msg.fields[i].name = PC2_data.getFields()[i].getName();
     PC2_data_msg.fields[i].offset = PC2_data.getFields()[i].getOffset();
     PC2_data_msg.fields[i].datatype = PC2_data.getFields()[i].getDatatype();
-    PC2_data_msg.fields[i].count = PC2_data.getFields()[i].getCount() // PC2_data_msg.fields.resize(PC2_data.getFields().size());;
+    PC2_data_msg.fields[i].count = PC2_data.getFields()[i].getCount();
+
     // std::cout << "PC2_data_msg.fields[i].name: " << PC2_data_msg.fields[i].name << std::endl;
 }
     }
