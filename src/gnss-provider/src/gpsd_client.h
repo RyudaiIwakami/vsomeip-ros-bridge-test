@@ -28,7 +28,7 @@
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
 
-#define DATA_SIZE 512 //ファイル名用
+#define DATA_SIZE 128 //ファイル名用
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 

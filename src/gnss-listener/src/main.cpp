@@ -11,7 +11,7 @@
 
 #include <sensor_msgs/msg/point_cloud2.hpp>
 
-#define DATA_SIZE 512 //ファイル名用
+#define DATA_SIZE 128 //ファイル名用
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
